@@ -1,8 +1,13 @@
 package client;
 
 import shared.messages.KVMessage;
+import shared.messages.Message;
+import shared.module.ClientCommunication;
 
 public class KVStore implements KVCommInterface {
+	private ClientCommunication clientCommunicationModule;
+	private String serverAdress;
+	private int serverPort;
 	/**
 	 * Initialize KVStore with address and port of KVServer
 	 * @param address the address of the KVServer
@@ -10,27 +15,44 @@ public class KVStore implements KVCommInterface {
 	 */
 	public KVStore(String address, int port) {
 		// TODO Auto-generated method stub
+		this.serverAdress = address;
+		this.serverPort = port;
+
 	}
 
 	@Override
 	public void connect() throws Exception {
 		// TODO Auto-generated method stub
+		if (this.clientCommunicationModule != null) {
+			this.clientCommunicationModule.closeConnection();
+		}
+		clientCommunicationModule = new ClientCommunication(serverAdress, serverPort);
 	}
 
 	@Override
 	public void disconnect() {
 		// TODO Auto-generated method stub
+		if (this.clientCommunicationModule != null) {
+			this.clientCommunicationModule.closeConnection();
+			this.clientCommunicationModule = null;
+		}
 	}
 
 	@Override
 	public KVMessage put(String key, String value) throws Exception {
 		// TODO Auto-generated method stub
-		return null;
+		Message putRequest = new Message(key, value, KVMessage.StatusType.PUT);
+		this.clientCommunicationModule.sendMessage(putRequest);
+		Message response = this.clientCommunicationModule.receiveMessage();
+		return response;
 	}
 
 	@Override
 	public KVMessage get(String key) throws Exception {
 		// TODO Auto-generated method stub
-		return null;
+		Message getRequest = new Message(key, null, KVMessage.StatusType.GET);
+		this.clientCommunicationModule.sendMessage(getRequest);
+		Message response = this.clientCommunicationModule.receiveMessage();
+		return response;
 	}
 }

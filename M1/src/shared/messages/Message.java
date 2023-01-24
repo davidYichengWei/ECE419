@@ -7,7 +7,7 @@ public class Message implements KVMessage, Serializable {
     private String value;
     private StatusType status;
 
-    Message(String key, String value, StatusType status) {
+    public Message(String key, String value, StatusType status) {
         this.key = key;
         this.value = value;
         this.status = status;
