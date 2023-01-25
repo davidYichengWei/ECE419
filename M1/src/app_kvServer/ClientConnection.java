@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 
 import org.apache.log4j.*;
+import shared.messages.KVMessage;
 import shared.messages.Message;
 
 
@@ -46,6 +47,16 @@ public class ClientConnection implements Runnable {
                 Message latestMessage = receiveMessage();
 
                 // Logic to process message and to send back a response
+                if (latestMessage.getStatus() == KVMessage.StatusType.GET) {
+                    sendMessage(new Message(
+                            latestMessage.getKey(), latestMessage.getValue(),
+                            KVMessage.StatusType.GET_SUCCESS));
+                }
+                else if (latestMessage.getStatus() == KVMessage.StatusType.PUT) {
+                    sendMessage(new Message(
+                            latestMessage.getKey(), latestMessage.getValue(),
+                            KVMessage.StatusType.PUT_SUCCESS));
+                }
             }
 
         }
@@ -93,7 +104,7 @@ public class ClientConnection implements Runnable {
      */
     private Message receiveMessage() throws IOException, ClassNotFoundException {
         Message msg = (Message) input.readObject();
-        logger.info("SEND request from \t<"
+        logger.info("RECEIVE request from \t<"
                 + clientSocket.getInetAddress().getHostAddress() + ":"
                 + clientSocket.getPort() + ">: {"
                 + msg.getStatus() + ", <"
