@@ -10,14 +10,14 @@ public class ClientCommunication implements Communication {
 
     private Logger logger = Logger.getRootLogger();
     private Socket clientSocket;
-    private OutputStream output;
-    private InputStream input;
+    private ObjectInputStream input;
+    private ObjectOutputStream output;
 
     public ClientCommunication(String address, int port) throws IOException {
         try {
             this.clientSocket = new Socket(address, port);
-            output = clientSocket.getOutputStream();
-            input = clientSocket.getInputStream();
+            output = new ObjectOutputStream(clientSocket.getOutputStream());
+            input = new ObjectInputStream(clientSocket.getInputStream());
             logger.info("Connection established");
         } catch (IOException e) {
             logger.error("Error connecting to server: " + e.getMessage(), e);
@@ -45,8 +45,8 @@ public class ClientCommunication implements Communication {
     @Override
     public void sendMessage(Message msg) throws IOException {
         try {
-            ObjectOutputStream out = new ObjectOutputStream(output);
-            out.writeObject(msg);
+            output.writeObject(msg);
+            output.flush();
         } catch (IOException e) {
             logger.error("Error sending message: " + e.getMessage(), e);
             throw new IOException("Error sending message: " + e.getMessage());
@@ -56,8 +56,7 @@ public class ClientCommunication implements Communication {
     @Override
     public Message receiveMessage() throws IOException {
         try {
-            ObjectInputStream in = new ObjectInputStream(input);
-            Message message = (Message) in.readObject();
+            Message message = (Message) input.readObject();
             return message;
         } catch (IOException e) {
             logger.error("Error receiving message: " + e.getMessage(), e);
