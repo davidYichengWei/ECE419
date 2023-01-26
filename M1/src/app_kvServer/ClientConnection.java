@@ -44,21 +44,26 @@ public class ClientConnection implements Runnable {
             input = new ObjectInputStream(clientSocket.getInputStream());
 
             while (isOpen) {
-                Message latestMessage = receiveMessage();
+                try {
+                    Message latestMessage = receiveMessage();
 
-                // Logic to process message and to send back a response
-                if (latestMessage.getStatus() == KVMessage.StatusType.GET) {
-                    sendMessage(new Message(
-                            latestMessage.getKey(), latestMessage.getValue(),
-                            KVMessage.StatusType.GET_SUCCESS));
+                    // Logic to process message and to send back a response
+                    if (latestMessage.getStatus() == KVMessage.StatusType.GET) {
+                        sendMessage(new Message(
+                                latestMessage.getKey(), latestMessage.getValue(),
+                                KVMessage.StatusType.GET_SUCCESS));
+                    }
+                    else if (latestMessage.getStatus() == KVMessage.StatusType.PUT) {
+                        sendMessage(new Message(
+                                latestMessage.getKey(), latestMessage.getValue(),
+                                KVMessage.StatusType.PUT_SUCCESS));
+                    }
                 }
-                else if (latestMessage.getStatus() == KVMessage.StatusType.PUT) {
-                    sendMessage(new Message(
-                            latestMessage.getKey(), latestMessage.getValue(),
-                            KVMessage.StatusType.PUT_SUCCESS));
+                catch (IOException ioe) {
+                    logger.error("Error! Connection lost!");
+                    isOpen = false;
                 }
             }
-
         }
         catch (IOException ioe) {
             logger.error("Error! Connection could not be established!", ioe);
