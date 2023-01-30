@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 public class KVClient implements IKVClient {
 
@@ -62,7 +63,7 @@ public class KVClient implements IKVClient {
 
         if(tokens[0].equals("quit")) {
             stop = true;
-            keyValueStore.disconnect();
+            this.disconnect();
             System.out.println(PROMPT + "Application exit!");
 
         } else if (tokens[0].equals("connect")){
@@ -88,12 +89,21 @@ public class KVClient implements IKVClient {
         } else if (tokens[0].equals("disconnect")) {
             this.disconnect();
         } else if (tokens[0].equals("put")) {
-            if(tokens.length == 3) {
+            if (keyValueStore == null) {
+                printError("Not connected to any server!");
+            }
+            else if(tokens.length == 3) {
                 try{
                     String key = tokens[1];
                     String value = tokens[2];
-                    Message response = (Message) keyValueStore.put(key, value);
-                    System.out.print(response.getStatus() + ": " + key + ":" + value);
+                    byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+                    byte[] valueBytes = value.getBytes(StandardCharsets.UTF_8);
+                    if (keyBytes.length > 20 || valueBytes.length > 120 * 1024) {
+                        printError("Key must be a max length of 20 bytes and value must be a max length of 120 kiloBytes.");
+                    } else {
+                        Message response = (Message) keyValueStore.put(key, value);
+                        System.out.print(response.getStatus() + ": " + key + ":" + value);
+                    }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -101,7 +111,10 @@ public class KVClient implements IKVClient {
                 printError("Invalid number of parameters!");
             }
         } else if (tokens[0].equals("get")) {
-            if (tokens.length == 2) {
+            if (keyValueStore == null) {
+                printError("Not connected to any server!");
+            }
+            else if (tokens.length == 2) {
                 String key = tokens[1];
                 try {
                     Message response = (Message) keyValueStore.get(key);
