@@ -25,13 +25,16 @@ public class ClientConnection implements Runnable {
     private ObjectInputStream input;
     private ObjectOutputStream output;
 
+    private KVServer server;
+
     /**
      * Constructs a new ClientConnection object for a given TCP socket.
      * @param clientSocket the Socket object for the client connection.
      */
-    public ClientConnection(Socket clientSocket) {
+    public ClientConnection(Socket clientSocket, KVServer server) {
         this.clientSocket = clientSocket;
         this.isOpen = true;
+        this.server = server;
     }
 
     /**
@@ -49,11 +52,25 @@ public class ClientConnection implements Runnable {
 
                     // Logic to process message and to send back a response
                     if (latestMessage.getStatus() == KVMessage.StatusType.GET) {
+                        try {
+                            server.getKV(latestMessage.getKey());
+                        }
+                        catch (Exception ex) {
+                            logger.error("Error get!", ex);
+                        }
+                        
                         sendMessage(new Message(
                                 latestMessage.getKey(), latestMessage.getValue(),
                                 KVMessage.StatusType.GET_SUCCESS));
                     }
                     else if (latestMessage.getStatus() == KVMessage.StatusType.PUT) {
+                        try {
+                            server.putKV(latestMessage.getKey(), latestMessage.getValue());
+                        }
+                        catch (Exception ex) {
+                            logger.error("Errpr put!", ex);
+                        }
+
                         sendMessage(new Message(
                                 latestMessage.getKey(), latestMessage.getValue(),
                                 KVMessage.StatusType.PUT_SUCCESS));

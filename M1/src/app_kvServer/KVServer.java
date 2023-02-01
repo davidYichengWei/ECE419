@@ -4,10 +4,14 @@ import logger.LogSetup;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.net.InetAddress;
+import app_kvServer.storage.FileStorage;
 
 public class KVServer implements IKVServer {
 
@@ -18,7 +22,7 @@ public class KVServer implements IKVServer {
 	private boolean running;
 	private int cacheSize;
 	private CacheStrategy cacheStrategy;
-
+	private FileStorage fs;
 	/**
 	 * Start KV Server at given port
 	 * @param port given port for storage server to operate
@@ -43,7 +47,9 @@ public class KVServer implements IKVServer {
 	@Override
     public String getHostname(){
 		// TODO Auto-generated method stub
-		return null;
+		// InetAddress ia = InetAddress.getLocalHost();
+		// String host = ia.getHostName();
+		return "127.0.0.1";
 	}
 
 	@Override
@@ -59,24 +65,31 @@ public class KVServer implements IKVServer {
 	@Override
     public boolean inStorage(String key){
 		// TODO Auto-generated method stub
-		return false;
+		
+		return fs.ifInStorage(key);
 	}
 
 	@Override
     public boolean inCache(String key){
 		// TODO Auto-generated method stub
+		// return CacheStorage.ifInCache(key);
 		return false;
 	}
 
 	@Override
     public String getKV(String key) throws Exception{
 		// TODO Auto-generated method stub
-		return "";
+		return fs.getKV(key);
 	}
 
 	@Override
     public void putKV(String key, String value) throws Exception{
 		// TODO Auto-generated method stub
+		if (fs == null) {
+			logger.error("fs is null");
+		}
+		fs.putKV(key, value);
+		
 	}
 
 	@Override
@@ -86,6 +99,7 @@ public class KVServer implements IKVServer {
 
 	@Override
     public void clearStorage(){
+		fs.clearStorage();
 		// TODO Auto-generated method stub
 	}
 
@@ -103,7 +117,7 @@ public class KVServer implements IKVServer {
 				try {
 					Socket client = serverSocket.accept();
 					ClientConnection connection =
-							new ClientConnection(client);
+							new ClientConnection(client, this);
 					new Thread(connection).start();
 
 					logger.info("Connected to "
@@ -123,7 +137,21 @@ public class KVServer implements IKVServer {
 	 */
 	private boolean initializeServer() {
 		logger.info("Initialize server ...");
+
 		try {
+			fs = new FileStorage();
+		}
+		catch (Exception ex) {
+			logger.error(ex);
+		}
+
+		if (fs == null) {
+			logger.error("Failed to initialize fs");
+		}
+
+		
+		try {
+			
 			serverSocket = new ServerSocket(port);
 			logger.info("Server listening on port: "
 					+ serverSocket.getLocalPort());

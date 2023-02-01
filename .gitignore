@@ -28,3 +28,6 @@ hs_err_pid*
 
 .idea/
 *.MF
+
+# Ignore db_files
+db.*
