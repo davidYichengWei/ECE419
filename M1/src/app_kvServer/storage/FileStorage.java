@@ -104,12 +104,8 @@ public class FileStorage implements IFileStorage{
     {
         String value=null;
         value=this.hash_table.get(key);
-        if(value == null){
-            return "";
-        }
-        else{
-            return value;
-        }
+        
+        return value;
     }
     @Override
     public boolean ifInStorage(String key){
