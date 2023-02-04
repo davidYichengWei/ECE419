@@ -54,9 +54,14 @@ public class ClientConnection implements Runnable {
                     if (latestMessage.getStatus() == KVMessage.StatusType.GET) {
                         try {
                             String value = server.getKV(latestMessage.getKey());
+                            KVMessage.StatusType status = KVMessage.StatusType.GET_SUCCESS;
+                            if (value == null) {
+                                status = KVMessage.StatusType.GET_ERROR;
+                            }
+
                             sendMessage(new Message(
                                 latestMessage.getKey(), value,
-                                KVMessage.StatusType.GET_SUCCESS));
+                                status));
                         }
                         catch (Exception ex) {
                             logger.error("GET ERROR", ex);
@@ -69,22 +74,19 @@ public class ClientConnection implements Runnable {
                         // Check if PUT, PUT_UPDATE or DELETE
                         boolean delete = false;
                         boolean update = false;
-                        if (latestMessage.getValue() == null) {
+                        if (latestMessage.getValue().equals("null")) {
                             delete = true;
                         }
-                        if (!update) {
-                            System.out.println("update is false");
-                        }
-                        try {
-                            String value = server.getKV(latestMessage.getKey());
-                            if (value != null) {
-                                update = true;
-                                System.out.println(value);
-                                System.out.println("update is true");
+                        else {
+                            try {
+                                String value = server.getKV(latestMessage.getKey());
+                                if (value != null) {
+                                    update = true;
+                                }
                             }
-                        }
-                        catch (Exception ex) {
-                            logger.error("Error getting value during put checking", ex);
+                            catch (Exception ex) {
+                                logger.error("Error getting value during put checking", ex);
+                            }
                         }
 
                         try {
@@ -96,6 +98,7 @@ public class ClientConnection implements Runnable {
                             else if (update) {
                                 status = KVMessage.StatusType.PUT_UPDATE;
                             }
+
                             sendMessage(new Message(
                                 latestMessage.getKey(), latestMessage.getValue(),
                                 status));

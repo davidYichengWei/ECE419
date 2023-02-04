@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.net.InetAddress;
 import app_kvServer.storage.FileStorage;
 
-public class KVServer implements IKVServer {
+public class KVServer implements IKVServer, Runnable {
 
 	private static Logger logger = Logger.getRootLogger();
 
@@ -37,6 +37,7 @@ public class KVServer implements IKVServer {
 		this.port = port;
 		this.cacheSize = cacheSize;
 		this.cacheStrategy = CacheStrategy.valueOf(strategy);
+		new Thread(this).start(); // To prevent blocking in tests
 	}
 	
 	@Override
@@ -204,7 +205,7 @@ public class KVServer implements IKVServer {
 					System.exit(1);
 				}
 
-				new KVServer(port, cacheSize, cacheStrategy).run();
+				new KVServer(port, cacheSize, cacheStrategy);
 			}
 		} catch (IOException e) {
 			System.out.println("Error! Unable to initialize logger!");
