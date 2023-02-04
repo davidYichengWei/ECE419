@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 public class KVClient implements IKVClient {
 
     private static Logger logger = Logger.getRootLogger();
-    private static final String PROMPT = "EchoClient> ";
+    private static final String PROMPT = "KVClient> ";
     private boolean stop = false;
     private BufferedReader stdin;
     private String serverAddress;
@@ -92,7 +92,7 @@ public class KVClient implements IKVClient {
             if (keyValueStore == null) {
                 printError("Not connected to any server!");
             }
-            else if(tokens.length == 3) {
+            else if(tokens.length >= 3) {
                 try{
                     String key = tokens[1];
                     String value = cmdLine.substring(cmdLine.indexOf(key) + key.length() + 1);
@@ -102,7 +102,7 @@ public class KVClient implements IKVClient {
                         printError("Key must be a max length of 20 bytes and value must be a max length of 120 kiloBytes.");
                     } else {
                         Message response = (Message) keyValueStore.put(key, value);
-                        System.out.print(response.getStatus() + ": " + key + ":" + value);
+                        System.out.println("Received Response: {" + response.getStatus() + ", <" + key + ", " + value + ">}");
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -116,9 +116,11 @@ public class KVClient implements IKVClient {
             }
             else if (tokens.length == 2) {
                 String key = tokens[1];
+                String value;
                 try {
                     Message response = (Message) keyValueStore.get(key);
-                    System.out.print(response.getStatus() + ": " + response.getValue());
+                    value = response.getValue();
+                    System.out.println("Received Response: {" + response.getStatus() + ", <" + key + ", " + value + ">}");
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -132,7 +134,7 @@ public class KVClient implements IKVClient {
                     this.printError("No valid log level!");
                     this.printPossibleLogLevels();
                 } else {
-                    System.out.println("EchoClient> Log level changed to level " + level);
+                    System.out.println("KVClient> Log level changed to level " + level);
                 }
             } else {
                 this.printError("Invalid number of parameters!");
@@ -143,8 +145,8 @@ public class KVClient implements IKVClient {
         }
     }
     private void printPossibleLogLevels() {
-        System.out.println("EchoClient> Possible log levels are:");
-        System.out.println("EchoClient> ALL | DEBUG | INFO | WARN | ERROR | FATAL | OFF");
+        System.out.println("KVClient> Possible log levels are:");
+        System.out.println("KVClient> ALL | DEBUG | INFO | WARN | ERROR | FATAL | OFF");
     }
 
     private String setLevel(String levelString) {
@@ -187,8 +189,6 @@ public class KVClient implements IKVClient {
         sb.append("\t\t put <key> <value> pair to the server \n");
         sb.append(PROMPT).append("get <key>");
         sb.append("\t\t get the <value> of <key> from the server \n");
-        sb.append(PROMPT).append("send <text message>");
-        sb.append("\t\t sends a text message to the server \n");
         sb.append(PROMPT).append("disconnect");
         sb.append("\t\t\t disconnects from the server \n");
 
