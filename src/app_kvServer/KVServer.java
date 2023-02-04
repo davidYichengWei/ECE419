@@ -17,7 +17,12 @@ public class KVServer implements IKVServer, Runnable {
 
 	private static Logger logger = Logger.getRootLogger();
 
+	// Parameters for server initialization
+	private String serverAddress = "localhost";
 	private int port;
+	private String logPath;
+	private String logLevel = "ALL";
+
 	private ServerSocket serverSocket;
 	private boolean running;
 	private int cacheSize;
@@ -25,6 +30,7 @@ public class KVServer implements IKVServer, Runnable {
 	private FileStorage fs;
 	/**
 	 * Start KV Server at given port
+	 * @param address that the server binds to
 	 * @param port given port for storage server to operate
 	 * @param cacheSize specifies how many key-value pairs the server is allowed
 	 *           to keep in-memory
@@ -33,7 +39,8 @@ public class KVServer implements IKVServer, Runnable {
 	 *           currently not contained in the cache. Options are "FIFO", "LRU",
 	 *           and "LFU".
 	 */
-	public KVServer(int port, int cacheSize, String strategy) {
+	public KVServer(String serverAddress, int port, int cacheSize, String strategy) {
+		this.serverAddress = serverAddress;
 		this.port = port;
 		this.cacheSize = cacheSize;
 		this.cacheStrategy = CacheStrategy.valueOf(strategy);
@@ -187,30 +194,79 @@ public class KVServer implements IKVServer, Runnable {
 	 */
 	public static void main(String[] args) {
 		try {
-			new LogSetup("logs/server.log", Level.ALL);
-			if(args.length != 3) {
-				System.out.println("Error! Invalid number of arguments!");
-				System.out.println("Usage: Server <port> <cacheSize> <cacheStrategy>");
-			} else {
-				int port = Integer.parseInt(args[0]);
-				int cacheSize = Integer.parseInt(args[1]);
-				String cacheStrategy = args[2];
+			if (args.length %2 != 0) {
+				// Print usage
+				System.out.println("Usage: Server -a <address> -p <port> -d <file directory> -l <log path> -ll <log level>");
+			}
+			else {
+				String address = "localhost";
+				String fileDirectory;
+				int port = 8080;
+				String logPath = "logs/server.log";
+				String logLevel = "ALL";
+
+				String curFlag = "-h";
+				for (int i = 0; i < args.length; i++) {
+					if (i %2 == 0) {
+						curFlag = args[i];
+					}
+					else {
+						switch (curFlag) {
+							case "-a":
+								address = args[i];
+								break;
+							case "-p":
+								System.out.println("Setting port to " + args[i]);
+								port = Integer.parseInt(args[i]);
+								break;
+							case "-d":
+								fileDirectory = args[i];
+								break;
+							case "-l":
+								logPath = args[i];
+								break;
+							case "-ll":
+								logLevel = args[i];
+								break;
+							default:
+								System.out.println("Usage: Server -a <address> -p <port> -d <file directory> -l <log path> -ll <log level>");
+								System.exit(1);
+								break;
+						}
+					}
+				}
 
 				try {
-					CacheStrategy strategy = CacheStrategy.valueOf(cacheStrategy);
-				}
-				catch (IllegalArgumentException e) {
-					System.out.println("Error! <cacheStrategy> must be one of: FIFO, LRU, LFU or None");
-					System.out.println("Usage: Server <port> <cacheSize> <cacheStrategy>");
+					new LogSetup(logPath, Level.toLevel(logLevel));
+				} catch (IOException e) {
+					System.out.println("Error! Unable to initialize logger!");
+					e.printStackTrace();
 					System.exit(1);
 				}
-
-				new KVServer(port, cacheSize, cacheStrategy);
+				
+				new KVServer(address, port, 100, "FIFO");
 			}
-		} catch (IOException e) {
-			System.out.println("Error! Unable to initialize logger!");
-			e.printStackTrace();
-			System.exit(1);
+
+			// new LogSetup("logs/server.log", Level.ALL);
+			// if(args.length != 3) {
+			// 	System.out.println("Error! Invalid number of arguments!");
+			// 	System.out.println("Usage: Server <port> <cacheSize> <cacheStrategy>");
+			// } else {
+			// 	int port = Integer.parseInt(args[0]);
+			// 	int cacheSize = Integer.parseInt(args[1]);
+			// 	String cacheStrategy = args[2];
+
+			// 	try {
+			// 		CacheStrategy strategy = CacheStrategy.valueOf(cacheStrategy);
+			// 	}
+			// 	catch (IllegalArgumentException e) {
+			// 		System.out.println("Error! <cacheStrategy> must be one of: FIFO, LRU, LFU or None");
+			// 		System.out.println("Usage: Server <port> <cacheSize> <cacheStrategy>");
+			// 		System.exit(1);
+			// 	}
+
+			// 	new KVServer(port, cacheSize, cacheStrategy);
+			// }
 		} catch (NumberFormatException nfe) {
 			System.out.println("Error! Invalid argument! Either <port> or <cacheSize> is not a number!");
 			System.out.println("Usage: Server <port> <cacheSize> <cacheStrategy>");
