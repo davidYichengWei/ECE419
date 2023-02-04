@@ -95,7 +95,7 @@ public class KVClient implements IKVClient {
             else if(tokens.length == 3) {
                 try{
                     String key = tokens[1];
-                    String value = tokens[2];
+                    String value = cmdLine.substring(cmdLine.indexOf(key) + key.length() + 1);
                     byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
                     byte[] valueBytes = value.getBytes(StandardCharsets.UTF_8);
                     if (keyBytes.length > 20 || valueBytes.length > 120 * 1024) {

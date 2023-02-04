@@ -5,6 +5,7 @@ import shared.messages.Message;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class ClientCommunication implements Communication {
 
@@ -19,9 +20,9 @@ public class ClientCommunication implements Communication {
             output = new ObjectOutputStream(clientSocket.getOutputStream());
             input = new ObjectInputStream(clientSocket.getInputStream());
             logger.info("Connection established");
-        } catch (IOException e) {
-            logger.error("Error connecting to server: " + e.getMessage(), e);
-            throw new IOException("Error connecting to server: " + e.getMessage());
+        } catch (UnknownHostException e) {
+            logger.error("Unknown host: " + e.getMessage(), e);
+            throw new IOException("Unknown host: " + e.getMessage());
         }
     }
     public synchronized void closeConnection() {

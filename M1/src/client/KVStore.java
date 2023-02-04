@@ -4,6 +4,9 @@ import shared.messages.KVMessage;
 import shared.messages.Message;
 import shared.module.ClientCommunication;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
+
 public class KVStore implements KVCommInterface {
 	private ClientCommunication clientCommunicationModule;
 	private String serverAdress;
@@ -21,12 +24,18 @@ public class KVStore implements KVCommInterface {
 	}
 
 	@Override
-	public void connect() throws Exception {
+	public void connect() throws UnknownHostException {
 		// TODO Auto-generated method stub
 		if (this.clientCommunicationModule != null) {
 			this.clientCommunicationModule.closeConnection();
+			return;
 		}
-		clientCommunicationModule = new ClientCommunication(serverAdress, serverPort);
+		try {
+			clientCommunicationModule = new ClientCommunication(serverAdress, serverPort);
+		} catch (IOException e) {
+			// Handle the exception here
+			throw new UnknownHostException("Unknown host: " + e.getMessage());
+		}
 	}
 
 	@Override
