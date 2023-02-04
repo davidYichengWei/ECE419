@@ -41,7 +41,7 @@ public class ClientConnection implements Runnable {
      * Initializes and starts the client connection.
      * Loops until the connection is closed or aborted by the client.
      */
-    public void run() {
+    public synchronized void run() {
         try {
             output = new ObjectOutputStream(clientSocket.getOutputStream());
             input = new ObjectInputStream(clientSocket.getInputStream());
