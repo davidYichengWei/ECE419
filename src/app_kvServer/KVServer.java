@@ -93,9 +93,7 @@ public class KVServer implements IKVServer, Runnable {
 	@Override
     public void putKV(String key, String value) throws Exception{
 		// TODO Auto-generated method stub
-		if (fs == null) {
-			logger.error("fs is null");
-		}
+		
 		fs.putKV(key, value);
 		
 	}

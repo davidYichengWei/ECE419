@@ -1,13 +1,16 @@
 package app_kvServer.storage;
 import java.io.*;
 import java.util.*;
-
+import logger.LogSetup;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import javax.swing.plaf.metal.MetalIconFactory.FileIcon16;
 
 import app_kvServer.storage.IFileStorage;
 
 
 public class FileStorage implements IFileStorage{
+    private static Logger logger = Logger.getRootLogger();
     public final String file_path;
     public final String file_name;
     private Integer key_max_len = 20;
@@ -28,42 +31,58 @@ public class FileStorage implements IFileStorage{
     }
     private void initialize() throws Exception{
         hash_table=new HashMap<String,String>();
-        if(this.db_file ==null){
+        System.out.println("file exists");
+        // if(this.db_file ==null){
             File f1 = new File(this.file_path);
             if(!f1.exists()){
                 try{
                     f1.mkdir();
                 }
                 catch(Exception e){
-                    System.out.println("creating directory failed");
+                    logger.error("Error! " +
+							"Unable to create directory for database. \n", e);
                 }
                 
             }
-            this.db_file = new File(this.file_path+"/"+this.file_name);
-            try{
-                this.db_file.createNewFile();
+            else{
+                this.db_file = new File(this.file_path+"/"+this.file_name);
+            
+                try{
+                    if(this.db_file.exists()){
+                        
+                        loadKVFromFile();
+                        logger.info("Loading existing database file into memory. \n");
+                    }
+                    else{
+                        this.db_file.createNewFile();
+                        logger.info("Creating database file. \n");
+                    }
+                    
+                }
+                catch(Exception e){
+                    logger.error("Error! " +
+							"Unable to create file for database. \n", e);
+                }
             }
-            catch(Exception e){
-                System.out.println("creating database file failed");
-            }
-        }
+            
+        
+        
     }
-    private Map<String, String> loadKVFromFile(){
+    private void loadKVFromFile(){
         Properties prop = new Properties();
-        Map<String, String> temp = new HashMap<String, String>();
+        // Map<String, String> temp = new HashMap<String, String>();
         try{
-            FileInputStream fin = new FileInputStream(file_path+"/"+file_name);
-            Iterator<String> it = prop.stringPropertyNames().iterator();
-            while(it.hasNext())
+            FileInputStream fin= new FileInputStream(file_path+"/"+file_name);
+            prop.load(fin);
+            for (String key : prop.stringPropertyNames())
             {
-                String key = it.next();
-                temp.put(key, prop.getProperty(key));
+                this.hash_table.put(key, prop.get(key).toString());
             }
             fin.close();
         } catch(Exception e){
-            System.out.println("failed loading kv from file");
+            logger.error("Error! " +
+							"Unable to open and load database file. \n", e);
         }
-        return temp;
     }
     private void storeKVInFile(){
         try{
@@ -77,13 +96,12 @@ public class FileStorage implements IFileStorage{
                 prop.put(i, hash_table.get(i));
 
             }
-            System.out.println("111");
             FileOutputStream file_output = new FileOutputStream(file_path+"/"+file_name);
-            System.out.println("222");
             prop.store(file_output, null);
-            System.out.println("333");
+            logger.info("Stored memory data into file. \n");
         } catch(IOException e){
-            System.out.println("storing file wrong.");
+            logger.error("Error! " +
+							"Unable to store memory data into database file. \n", e);
         }
     }
     @Override
@@ -92,7 +110,6 @@ public class FileStorage implements IFileStorage{
             this.hash_table.remove(key);
         }
         else{
-            System.out.println("Value " + value);
             this.hash_table.put(key, value);
         }
 
@@ -104,7 +121,6 @@ public class FileStorage implements IFileStorage{
     {
         String value=null;
         value=this.hash_table.get(key);
-        
         return value;
     }
     @Override
@@ -121,8 +137,10 @@ public class FileStorage implements IFileStorage{
         try{
             this.db_file.delete();
             this.hash_table.clear();
+            logger.info("Removed memory data and database file. \n");
         } catch(Exception e){
-            System.out.println("cant delete database file");
+            logger.error("Error! " +
+							"Unable to delete memory data and database file. \n", e);
         }
     }
 }
