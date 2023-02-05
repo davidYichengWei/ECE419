@@ -15,7 +15,7 @@ public class AllTests {
 	static {
 		try {
 			new LogSetup("logs/testing/test.log", Level.ERROR);
-			KVServer server = new KVServer("localhost", 50000, 10, "FIFO");
+			KVServer server = new KVServer("localhost", 50000, 10, "FIFO", "db_files");
 			server.clearStorage();
 		} catch (IOException e) {
 			e.printStackTrace();

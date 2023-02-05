@@ -12,21 +12,14 @@ import app_kvServer.storage.IFileStorage;
 public class FileStorage implements IFileStorage{
     private static Logger logger = Logger.getRootLogger();
     public final String file_path;
-    public final String file_name;
+    public final String file_name = "db.properties";
     private Integer key_max_len = 20;
     private Integer value_max_len = 120000;
     private Map<String, String> hash_table;
     private File db_file;
-
-    public FileStorage() throws Exception{
-        this.file_name = "db.properties";
-        this.file_path = "db_files";
-        initialize();
-    }
     
-    public FileStorage(String file_path, String file_name) throws Exception{
+    public FileStorage(String file_path) throws Exception{
         this.file_path = file_path;
-        this.file_name = file_name;
         initialize();
     }
     private void initialize() throws Exception{

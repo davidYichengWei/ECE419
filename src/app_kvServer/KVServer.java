@@ -38,8 +38,9 @@ public class KVServer implements IKVServer, Runnable {
 	 *           is full and there is a GET- or PUT-request on a key that is
 	 *           currently not contained in the cache. Options are "FIFO", "LRU",
 	 *           and "LFU".
+	 * @param directory where the database files are stored
 	 */
-	public KVServer(String serverAddress, int port, int cacheSize, String strategy) {
+	public KVServer(String serverAddress, int port, int cacheSize, String strategy, String fileDirectory) {
 		this.serverAddress = serverAddress;
 		this.port = port;
 		this.cacheSize = cacheSize;
@@ -47,7 +48,7 @@ public class KVServer implements IKVServer, Runnable {
 
 		// To be able to call clearStorage() at test setup
 		try {
-			fs = new FileStorage();
+			fs = new FileStorage(fileDirectory);
 		}
 		catch (Exception ex) {
 			logger.error(ex);
@@ -211,7 +212,7 @@ public class KVServer implements IKVServer, Runnable {
 			}
 			else {
 				String address = "localhost";
-				String fileDirectory;
+				String fileDirectory = "db_files";
 				int port = 8080;
 				String logPath = "logs/server.log";
 				String logLevel = "ALL";
@@ -255,7 +256,7 @@ public class KVServer implements IKVServer, Runnable {
 					System.exit(1);
 				}
 				
-				new KVServer(address, port, 100, "FIFO");
+				new KVServer(address, port, 100, "FIFO", fileDirectory);
 			}
 		} catch (NumberFormatException nfe) {
 			System.out.println("Error! Invalid argument! Either <port> or <cacheSize> is not a number!");
