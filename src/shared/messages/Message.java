@@ -27,7 +27,7 @@ public class Message implements KVMessage, Serializable {
         String encodedString = new String(bytes).trim();
         String[] parts = encodedString.split(DELIMITER);
         logger.info("status: " + parts[0].toUpperCase());
-        this.status = StatusType.valueOf(parts[0].toUpperCase());
+        this.status = StatusType.valueOf(parts[0].toUpperCase().trim());
         logger.info("key: " + parts[1]);
         this.key = parts[1];
 
