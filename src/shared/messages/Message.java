@@ -22,7 +22,7 @@ public class Message implements KVMessage, Serializable {
         this.value = value;
         this.status = status;
     }
-    public Message(byte[] encodedStringBytes) {
+    public Message(byte[] encodedStringBytes) throws IllegalArgumentException {
         byte[] bytes = addCtrChars(encodedStringBytes);
         String encodedString = new String(bytes).trim();
         String[] parts = encodedString.split(DELIMITER);

@@ -27,6 +27,9 @@ public class ClientConnection implements Runnable {
 
     private KVServer server;
 
+    private static final char LINE_FEED = 0x0A;
+    private static final char RETURN = 0x0D;
+
     /**
      * Constructs a new ClientConnection object for a given TCP socket.
      * @param clientSocket the Socket object for the client connection.
@@ -115,6 +118,10 @@ public class ClientConnection implements Runnable {
                         }
                     }
                 }
+                catch (IllegalArgumentException iae) {
+                    logger.error("Error! Unable to parse message!", iae);
+                    sendFailedMessage("FAILED Message format unknown!");
+                }
                 catch (IOException ioe) {
                     logger.error("Error! Connection lost!");
                     isOpen = false;
@@ -163,7 +170,7 @@ public class ClientConnection implements Runnable {
      * @throws IOException some I/O error regarding the output stream
      * @throws ClassNotFoundException definition of the object received not found
      */
-    private Message receiveMessage() throws IOException, ClassNotFoundException {
+    private Message receiveMessage() throws IOException, ClassNotFoundException, IllegalArgumentException {
         int index = 0;
         byte[] msgBytes = null, tmp = null;
         byte[] bufferBytes = new byte[BUFFER_SIZE];
@@ -228,5 +235,32 @@ public class ClientConnection implements Runnable {
         return msg;
     }
 
+    /**
+     * Method sends a Message object using this socket,
+     * containing response status, key and value.
+     * @param description of the error.
+     * @throws IOException some I/O error regarding the output stream
+     */
+    public void sendFailedMessage(String errorDescription) throws IOException {
+        try {
+            byte[] msgBytes = toByteArray(errorDescription);
+            output.write(msgBytes, 0, msgBytes.length);
+            output.flush();
+        } catch (IOException e) {
+            logger.error("Error sending message: " + e.getMessage(), e);
+            throw new IOException("Error sending message: " + e.getMessage());
+        }
+    }
+
+    private byte[] toByteArray(String s){
+		byte[] bytes = s.getBytes();
+		byte[] ctrBytes = new byte[]{LINE_FEED, RETURN};
+		byte[] tmp = new byte[bytes.length + ctrBytes.length];
+		
+		System.arraycopy(bytes, 0, tmp, 0, bytes.length);
+		System.arraycopy(ctrBytes, 0, tmp, bytes.length, ctrBytes.length);
+		
+		return tmp;		
+	}
 
 }
