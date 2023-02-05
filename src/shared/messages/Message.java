@@ -8,7 +8,7 @@ public class Message implements KVMessage, Serializable {
 
 
     private static Logger logger = Logger.getRootLogger();
-    private static final String DELIMITER = "@";
+    private static final String DELIMITER = " ";
     private String key;
     private String value;
     private StatusType status;
