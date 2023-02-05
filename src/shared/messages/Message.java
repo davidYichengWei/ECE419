@@ -26,12 +26,12 @@ public class Message implements KVMessage, Serializable {
         byte[] bytes = addCtrChars(encodedStringBytes);
         String encodedString = new String(bytes).trim();
         String[] parts = encodedString.split(DELIMITER);
-        this.key = parts[0];
-        logger.info("key: " + parts[0]);
-        this.value = parts[1];
-        logger.info("value: " + parts[1]);
-        logger.info("status: " + parts[2]);
-        this.status = StatusType.valueOf(parts[2]);
+        this.status = StatusType.valueOf(parts[0]);
+        this.key = parts[1];
+        this.value = parts[2];
+        logger.info("status: " + parts[0]);
+        logger.info("key: " + parts[1]);
+        logger.info("value: " + parts[2]);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class Message implements KVMessage, Serializable {
 
 
     public String getEncodedString() {
-        return this.getKey() + DELIMITER + this.getValue() + DELIMITER + this.getStatus().toString();
+        return this.getStatus().toString() + DELIMITER + this.getKey() + DELIMITER + this.getValue();
     }
 
     private byte[] addCtrChars(byte[] bytes) {
