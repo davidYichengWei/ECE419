@@ -22,8 +22,8 @@ public class ClientConnection implements Runnable {
     private static final int DROP_SIZE = 128 * BUFFER_SIZE;
 
     private Socket clientSocket;
-    private ObjectInputStream input;
-    private ObjectOutputStream output;
+    private InputStream input;
+    private OutputStream output;
 
     private KVServer server;
 
@@ -43,8 +43,8 @@ public class ClientConnection implements Runnable {
      */
     public synchronized void run() {
         try {
-            output = new ObjectOutputStream(clientSocket.getOutputStream());
-            input = new ObjectInputStream(clientSocket.getInputStream());
+            output = clientSocket.getOutputStream();
+            input = clientSocket.getInputStream();
 
             while (isOpen) {
                 try {
@@ -148,14 +148,14 @@ public class ClientConnection implements Runnable {
      * @throws IOException some I/O error regarding the output stream
      */
     public void sendMessage(Message msg) throws IOException {
-        output.writeObject(msg);
-        output.flush();
-        logger.info("SEND response to \t<"
-                + clientSocket.getInetAddress().getHostAddress() + ":"
-                + clientSocket.getPort() + ">: {"
-                + msg.getStatus() + ", <"
-                + msg.getKey() + ", "
-                + msg.getValue() + ">}");
+        try {
+            byte[] msgBytes = msg.toByteArray();
+            output.write(msgBytes, 0, msgBytes.length);
+            output.flush();
+        } catch (IOException e) {
+            logger.error("Error sending message: " + e.getMessage(), e);
+            throw new IOException("Error sending message: " + e.getMessage());
+        }
     }
 
     /**
@@ -164,7 +164,60 @@ public class ClientConnection implements Runnable {
      * @throws ClassNotFoundException definition of the object received not found
      */
     private Message receiveMessage() throws IOException, ClassNotFoundException {
-        Message msg = (Message) input.readObject();
+        int index = 0;
+        byte[] msgBytes = null, tmp = null;
+        byte[] bufferBytes = new byte[BUFFER_SIZE];
+
+        /* read first char from stream */
+        byte read = (byte) input.read();
+        boolean reading = true;
+
+        while(read != 13 && reading) {/* carriage return */
+            /* if buffer filled, copy to msg array */
+            if(index == BUFFER_SIZE) {
+                if(msgBytes == null){
+                    tmp = new byte[BUFFER_SIZE];
+                    System.arraycopy(bufferBytes, 0, tmp, 0, BUFFER_SIZE);
+                } else {
+                    tmp = new byte[msgBytes.length + BUFFER_SIZE];
+                    System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
+                    System.arraycopy(bufferBytes, 0, tmp, msgBytes.length,
+                            BUFFER_SIZE);
+                }
+
+                msgBytes = tmp;
+                bufferBytes = new byte[BUFFER_SIZE];
+                index = 0;
+            }
+
+            /* only read valid characters, i.e. letters and numbers */
+            if((read > 31 && read < 127)) {
+                bufferBytes[index] = read;
+                index++;
+            }
+
+            /* stop reading is DROP_SIZE is reached */
+            if(msgBytes != null && msgBytes.length + index >= DROP_SIZE) {
+                reading = false;
+            }
+
+            /* read next char from stream */
+            read = (byte) input.read();
+        }
+
+        if(msgBytes == null){
+            tmp = new byte[index];
+            System.arraycopy(bufferBytes, 0, tmp, 0, index);
+        } else {
+            tmp = new byte[msgBytes.length + index];
+            System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
+            System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, index);
+        }
+
+        msgBytes = tmp;
+
+        /* build final String */
+        Message msg = new Message(msgBytes);
         logger.info("RECEIVE request from \t<"
                 + clientSocket.getInetAddress().getHostAddress() + ":"
                 + clientSocket.getPort() + ">: {"

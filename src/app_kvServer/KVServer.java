@@ -30,7 +30,7 @@ public class KVServer implements IKVServer, Runnable {
 	private FileStorage fs;
 	/**
 	 * Start KV Server at given port
-	 * @param address that the server binds to
+	 * @param serverAddress that the server binds to
 	 * @param port given port for storage server to operate
 	 * @param cacheSize specifies how many key-value pairs the server is allowed
 	 *           to keep in-memory
