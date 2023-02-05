@@ -106,7 +106,7 @@ public class FileStorage implements IFileStorage{
     }
     @Override
     public void putKV(String key, String value){
-        if(value==null){
+        if(value.equals("null")){
             this.hash_table.remove(key);
         }
         else{
