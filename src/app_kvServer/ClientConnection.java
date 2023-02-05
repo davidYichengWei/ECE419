@@ -44,7 +44,7 @@ public class ClientConnection implements Runnable {
      * Initializes and starts the client connection.
      * Loops until the connection is closed or aborted by the client.
      */
-    public synchronized void run() {
+    public void run() {
         try {
             output = clientSocket.getOutputStream();
             input = clientSocket.getInputStream();
@@ -52,69 +52,72 @@ public class ClientConnection implements Runnable {
             while (isOpen) {
                 try {
                     Message latestMessage = receiveMessage();
-
-                    // Logic to process message and to send back a response
-                    if (latestMessage.getStatus() == KVMessage.StatusType.GET) {
-                        try {
-                            String value = server.getKV(latestMessage.getKey());
-                            KVMessage.StatusType status = KVMessage.StatusType.GET_SUCCESS;
-                            if (value == null) {
-                                status = KVMessage.StatusType.GET_ERROR;
-                            }
-
-                            sendMessage(new Message(
-                                latestMessage.getKey(), value,
-                                status));
-                        }
-                        catch (Exception ex) {
-                            logger.error("GET ERROR", ex);
-                            sendMessage(new Message(
-                                latestMessage.getKey(), latestMessage.getValue(),
-                                KVMessage.StatusType.GET_ERROR));
-                        }
-                    }
-                    else if (latestMessage.getStatus() == KVMessage.StatusType.PUT) {
-                        // Check if PUT, PUT_UPDATE or DELETE
-                        boolean delete = false;
-                        boolean update = false;
-                        if (latestMessage.getValue().equals("null")) {
-                            delete = true;
-                        }
-                        else {
+                    
+                    // Synchronize I/O to prevent concurrent access to K/V pairs
+                    synchronized (this) {
+                        // Logic to process message and to send back a response
+                        if (latestMessage.getStatus() == KVMessage.StatusType.GET) {
                             try {
                                 String value = server.getKV(latestMessage.getKey());
-                                if (value != null) {
-                                    update = true;
+                                KVMessage.StatusType status = KVMessage.StatusType.GET_SUCCESS;
+                                if (value == null) {
+                                    status = KVMessage.StatusType.GET_ERROR;
                                 }
+
+                                sendMessage(new Message(
+                                    latestMessage.getKey(), value,
+                                    status));
                             }
                             catch (Exception ex) {
-                                logger.error("Error getting value during put checking", ex);
+                                logger.error("GET ERROR", ex);
+                                sendMessage(new Message(
+                                    latestMessage.getKey(), latestMessage.getValue(),
+                                    KVMessage.StatusType.GET_ERROR));
                             }
                         }
+                        else if (latestMessage.getStatus() == KVMessage.StatusType.PUT) {
+                            // Check if PUT, PUT_UPDATE or DELETE
+                            boolean delete = false;
+                            boolean update = false;
+                            if (latestMessage.getValue().equals("null")) {
+                                delete = true;
+                            }
+                            else {
+                                try {
+                                    String value = server.getKV(latestMessage.getKey());
+                                    if (value != null) {
+                                        update = true;
+                                    }
+                                }
+                                catch (Exception ex) {
+                                    logger.error("Error getting value during put checking", ex);
+                                }
+                            }
 
-                        try {
-                            server.putKV(latestMessage.getKey(), latestMessage.getValue());
-                            KVMessage.StatusType status = KVMessage.StatusType.PUT_SUCCESS;
-                            if (delete) {
-                                status = KVMessage.StatusType.DELETE_SUCCESS;
-                            }
-                            else if (update) {
-                                status = KVMessage.StatusType.PUT_UPDATE;
-                            }
+                            try {
+                                server.putKV(latestMessage.getKey(), latestMessage.getValue());
+                                KVMessage.StatusType status = KVMessage.StatusType.PUT_SUCCESS;
+                                if (delete) {
+                                    status = KVMessage.StatusType.DELETE_SUCCESS;
+                                }
+                                else if (update) {
+                                    status = KVMessage.StatusType.PUT_UPDATE;
+                                }
 
-                            sendMessage(new Message(
-                                latestMessage.getKey(), latestMessage.getValue(),
-                                status));
-                        }
-                        catch (Exception ex) {
-                            KVMessage.StatusType errorStatus = KVMessage.StatusType.PUT_ERROR;
-                            if (delete) {
-                                errorStatus = KVMessage.StatusType.DELETE_ERROR;
+                                sendMessage(new Message(
+                                    latestMessage.getKey(), latestMessage.getValue(),
+                                    status));
                             }
-                            logger.error("PUT ERROR", ex);
-                            sendMessage(new Message(
-                                latestMessage.getKey(), latestMessage.getValue(),
-                                errorStatus));
+                            catch (Exception ex) {
+                                KVMessage.StatusType errorStatus = KVMessage.StatusType.PUT_ERROR;
+                                if (delete) {
+                                    errorStatus = KVMessage.StatusType.DELETE_ERROR;
+                                }
+                                logger.error("PUT ERROR", ex);
+                                sendMessage(new Message(
+                                    latestMessage.getKey(), latestMessage.getValue(),
+                                    errorStatus));
+                            }
                         }
                     }
                 }
