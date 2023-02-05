@@ -96,6 +96,27 @@ public class InteractionTest extends TestCase {
 
 		assertTrue(ex == null && response.getStatus() == StatusType.DELETE_SUCCESS);
 	}
+
+	// Additional
+	@Test
+	public void testGetAfterDelete() {
+		String key = "deleteKey";
+		String value = "deleteValue";
+		
+		KVMessage response = null;
+		Exception ex = null;
+
+		try {
+			kvClient.put(key, value);
+			kvClient.put(key, "null");
+			response = kvClient.get(key);
+			
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
+	}
 	
 	@Test
 	public void testGet() {
@@ -129,6 +150,24 @@ public class InteractionTest extends TestCase {
 		assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
 	}
 	
+	// Additional
+	@Test
+	public void testValueWithSpaces() {
+		String key = "spaceKey";
+		String value = "one two three four";
+		KVMessage response = null;
+		Exception ex = null;
+
+		try {
+			kvClient.put(key, value);
+			response = kvClient.get(key);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getValue().equals(value) 
+			&& response.getStatus() == StatusType.GET_SUCCESS);
+	}
 
 
 }

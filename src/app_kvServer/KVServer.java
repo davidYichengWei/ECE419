@@ -44,6 +44,19 @@ public class KVServer implements IKVServer, Runnable {
 		this.port = port;
 		this.cacheSize = cacheSize;
 		this.cacheStrategy = CacheStrategy.valueOf(strategy);
+
+		// To be able to call clearStorage() at test setup
+		try {
+			fs = new FileStorage();
+		}
+		catch (Exception ex) {
+			logger.error(ex);
+		}
+
+		if (fs == null) {
+			logger.error("Failed to initialize fs");
+		}
+
 		new Thread(this).start(); // To prevent blocking in tests
 	}
 	
@@ -144,16 +157,16 @@ public class KVServer implements IKVServer, Runnable {
 	private boolean initializeServer() {
 		logger.info("Initialize server ...");
 
-		try {
-			fs = new FileStorage();
-		}
-		catch (Exception ex) {
-			logger.error(ex);
-		}
+		// try {
+		// 	fs = new FileStorage();
+		// }
+		// catch (Exception ex) {
+		// 	logger.error(ex);
+		// }
 
-		if (fs == null) {
-			logger.error("Failed to initialize fs");
-		}
+		// if (fs == null) {
+		// 	logger.error("Failed to initialize fs");
+		// }
 
 		
 		try {
@@ -187,7 +200,7 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	/**
-	 * Main entry point for the echo server application.
+	 * Main entry point for the KV server.
 	 * @param args contains the port number at args[0].
 	 */
 	public static void main(String[] args) {
@@ -244,27 +257,6 @@ public class KVServer implements IKVServer, Runnable {
 				
 				new KVServer(address, port, 100, "FIFO");
 			}
-
-			// new LogSetup("logs/server.log", Level.ALL);
-			// if(args.length != 3) {
-			// 	System.out.println("Error! Invalid number of arguments!");
-			// 	System.out.println("Usage: Server <port> <cacheSize> <cacheStrategy>");
-			// } else {
-			// 	int port = Integer.parseInt(args[0]);
-			// 	int cacheSize = Integer.parseInt(args[1]);
-			// 	String cacheStrategy = args[2];
-
-			// 	try {
-			// 		CacheStrategy strategy = CacheStrategy.valueOf(cacheStrategy);
-			// 	}
-			// 	catch (IllegalArgumentException e) {
-			// 		System.out.println("Error! <cacheStrategy> must be one of: FIFO, LRU, LFU or None");
-			// 		System.out.println("Usage: Server <port> <cacheSize> <cacheStrategy>");
-			// 		System.exit(1);
-			// 	}
-
-			// 	new KVServer(port, cacheSize, cacheStrategy);
-			// }
 		} catch (NumberFormatException nfe) {
 			System.out.println("Error! Invalid argument! Either <port> or <cacheSize> is not a number!");
 			System.out.println("Usage: Server <port> <cacheSize> <cacheStrategy>");
