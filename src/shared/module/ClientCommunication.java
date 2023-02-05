@@ -86,7 +86,7 @@ public class ClientCommunication implements Communication {
             }
 
             /* only read valid characters, i.e. letters and numbers */
-            if((read > 31 && read < 127)) {
+            if((read >= 31 && read < 127)) {
                 bufferBytes[index] = read;
                 index++;
             }

@@ -8,7 +8,7 @@ public class Message implements KVMessage, Serializable {
 
 
     private static Logger logger = Logger.getRootLogger();
-    private static final String DELIMITER = "@::@";
+    private static final String DELIMITER = Character.toString((char) 31);
     private String key;
     private String value;
     private StatusType status;
@@ -27,7 +27,7 @@ public class Message implements KVMessage, Serializable {
         String encodedString = new String(bytes).trim();
         String[] parts = encodedString.split(DELIMITER);
         logger.info("status: " + parts[0].toUpperCase());
-        this.status = StatusType.valueOf(parts[0].toUpperCase().trim());
+        this.status = StatusType.valueOf(parts[0].toUpperCase());
         logger.info("key: " + parts[1]);
         this.key = parts[1];
 
