@@ -8,7 +8,7 @@ public class PerformanceTest {
 
     public PerformanceTest() {
         try {
-            this.server = new KVServer("127.0.0.1", 8080, 2000, "LRU");
+            this.server = new KVServer("127.0.0.1", 8080, 2000, "LRU", "db_files");
         } catch (Exception e) {
             
         }
