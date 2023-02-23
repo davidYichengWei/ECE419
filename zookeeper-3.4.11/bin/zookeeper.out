@@ -1,0 +1,31 @@
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/nfs/ug/homes-4/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/build/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/nfs/ug/homes-4/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+2023-02-22 21:18:43,287 [myid:] - INFO  [main:QuorumPeerConfig@136] - Reading configuration from: /homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../conf/zoo.cfg
+2023-02-22 21:18:43,291 [myid:] - INFO  [main:DatadirCleanupManager@78] - autopurge.snapRetainCount set to 3
+2023-02-22 21:18:43,291 [myid:] - INFO  [main:DatadirCleanupManager@79] - autopurge.purgeInterval set to 0
+2023-02-22 21:18:43,291 [myid:] - INFO  [main:DatadirCleanupManager@101] - Purge task is not scheduled.
+2023-02-22 21:18:43,291 [myid:] - WARN  [main:QuorumPeerMain@116] - Either no config or no quorum defined in config, running  in standalone mode
+2023-02-22 21:18:43,299 [myid:] - INFO  [main:QuorumPeerConfig@136] - Reading configuration from: /homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../conf/zoo.cfg
+2023-02-22 21:18:43,299 [myid:] - INFO  [main:ZooKeeperServerMain@98] - Starting server
+2023-02-22 21:18:43,312 [myid:] - INFO  [main:Environment@100] - Server environment:zookeeper.version=3.4.11--1, built on 02/23/2023 02:03 GMT
+2023-02-22 21:18:43,312 [myid:] - INFO  [main:Environment@100] - Server environment:host.name=ug178.eecg.toronto.edu
+2023-02-22 21:18:43,312 [myid:] - INFO  [main:Environment@100] - Server environment:java.version=11.0.18
+2023-02-22 21:18:43,312 [myid:] - INFO  [main:Environment@100] - Server environment:java.vendor=Debian
+2023-02-22 21:18:43,312 [myid:] - INFO  [main:Environment@100] - Server environment:java.home=/usr/lib/jvm/java-11-openjdk-amd64
+2023-02-22 21:18:43,312 [myid:] - INFO  [main:Environment@100] - Server environment:java.class.path=/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../build/classes:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/slf4j-log4j12-1.6.1.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/slf4j-api-1.6.1.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/netty-3.10.5.Final.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/log4j-1.2.16.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/jline-0.9.94.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/audience-annotations-0.5.0.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../lib/slf4j-log4j12-1.6.1.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../lib/slf4j-api-1.6.1.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../lib/netty-3.10.5.Final.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../lib/log4j-1.2.16.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../lib/jline-0.9.94.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../lib/audience-annotations-0.5.0.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../zookeeper-3.4.11.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../src/java/lib/ivy-2.4.0.jar:/homes/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin/../conf:
+2023-02-22 21:18:43,312 [myid:] - INFO  [main:Environment@100] - Server environment:java.library.path=/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib
+2023-02-22 21:18:43,312 [myid:] - INFO  [main:Environment@100] - Server environment:java.io.tmpdir=/tmp
+2023-02-22 21:18:43,312 [myid:] - INFO  [main:Environment@100] - Server environment:java.compiler=<NA>
+2023-02-22 21:18:43,313 [myid:] - INFO  [main:Environment@100] - Server environment:os.name=Linux
+2023-02-22 21:18:43,313 [myid:] - INFO  [main:Environment@100] - Server environment:os.arch=amd64
+2023-02-22 21:18:43,313 [myid:] - INFO  [main:Environment@100] - Server environment:os.version=5.10.0-21-amd64
+2023-02-22 21:18:43,313 [myid:] - INFO  [main:Environment@100] - Server environment:user.name=weiyich1
+2023-02-22 21:18:43,313 [myid:] - INFO  [main:Environment@100] - Server environment:user.home=/homes/w/weiyich1
+2023-02-22 21:18:43,313 [myid:] - INFO  [main:Environment@100] - Server environment:user.dir=/nfs/ug/homes-4/w/weiyich1/ece419/ms1-gr34/zookeeper-3.4.11/bin
+2023-02-22 21:18:43,321 [myid:] - INFO  [main:ZooKeeperServer@825] - tickTime set to 2000
+2023-02-22 21:18:43,321 [myid:] - INFO  [main:ZooKeeperServer@834] - minSessionTimeout set to -1
+2023-02-22 21:18:43,321 [myid:] - INFO  [main:ZooKeeperServer@843] - maxSessionTimeout set to -1
+2023-02-22 21:18:43,328 [myid:] - INFO  [main:ServerCnxnFactory@117] - Using org.apache.zookeeper.server.NIOServerCnxnFactory as server connection factory
+2023-02-22 21:18:43,330 [myid:] - INFO  [main:NIOServerCnxnFactory@89] - binding to port 0.0.0.0/0.0.0.0:2181
