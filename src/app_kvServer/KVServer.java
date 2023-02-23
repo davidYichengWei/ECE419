@@ -13,6 +13,10 @@ import java.nio.file.Files;
 import java.net.InetAddress;
 import app_kvServer.storage.FileStorage;
 
+import org.slf4j.LoggerFactory; // Required for ZooKeeper
+import org.apache.zookeeper.*;
+import org.apache.zookeeper.data.Stat;
+
 public class KVServer implements IKVServer, Runnable {
 
 	private static Logger logger = Logger.getRootLogger();
@@ -28,6 +32,9 @@ public class KVServer implements IKVServer, Runnable {
 	private int cacheSize;
 	private CacheStrategy cacheStrategy;
 	private FileStorage fs;
+
+	private ZooKeeper zk;
+	private final String metadataPath = "/metadata";
 	/**
 	 * Start KV Server at given port
 	 * @param serverAddress that the server binds to
@@ -157,26 +164,10 @@ public class KVServer implements IKVServer, Runnable {
 	 */
 	private boolean initializeServer() {
 		logger.info("Initialize server ...");
-
-		// try {
-		// 	fs = new FileStorage();
-		// }
-		// catch (Exception ex) {
-		// 	logger.error(ex);
-		// }
-
-		// if (fs == null) {
-		// 	logger.error("Failed to initialize fs");
-		// }
-
-		
 		try {
-			
 			serverSocket = new ServerSocket(port);
 			logger.info("Server listening on port: "
 					+ serverSocket.getLocalPort());
-			return true;
-
 		} catch (IOException e) {
 			logger.error("Error! Cannot open server socket:");
 			if(e instanceof BindException){
@@ -184,6 +175,19 @@ public class KVServer implements IKVServer, Runnable {
 			}
 			return false;
 		}
+
+		try {
+			MetadataWatcher watcher = new MetadataWatcher(metadataPath);
+
+			zk = new ZooKeeper("localhost:2181", 5000, watcher);
+			logger.info("Connected to ZooKeeper");
+		}
+		catch (IOException ex) {
+			logger.error("Failed to connect to ZooKeeper");
+			return false;
+		}
+
+		return true;
 	}
 
 	private boolean isRunning() {
@@ -215,7 +219,7 @@ public class KVServer implements IKVServer, Runnable {
 				String fileDirectory = "db_files";
 				int port = 8080;
 				String logPath = "logs/server.log";
-				String logLevel = "ALL";
+				String logLevel = "INFO";
 
 				String curFlag = "-h";
 				for (int i = 0; i < args.length; i++) {
