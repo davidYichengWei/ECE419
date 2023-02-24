@@ -35,6 +35,9 @@ public class KVServer implements IKVServer, Runnable {
 
 	private ZooKeeper zk;
 	private final String metadataPath = "/metadata";
+	// Metadata of server keyrange, should be in the form <kr-from>, <kr-to>, <ip:port>; <kr-from>, <kr-to>, <ip:port>;...
+	private String metadata = "initial metadata";
+
 	/**
 	 * Start KV Server at given port
 	 * @param serverAddress that the server binds to
@@ -176,16 +179,45 @@ public class KVServer implements IKVServer, Runnable {
 			return false;
 		}
 
+		// Connect to ZooKeeper and create a watcher on path /metadata
 		try {
-			MetadataWatcher watcher = new MetadataWatcher(metadataPath);
-
-			zk = new ZooKeeper("localhost:2181", 5000, watcher);
+			zk = new ZooKeeper("localhost:2181", 3000, new Watcher() {
+				@Override
+				public void process(WatchedEvent event) {
+					try {
+						String newData = new String(zk.getData(metadataPath, true, null));
+						if (event.getType() == Event.EventType.NodeDataChanged && !newData.equals(metadata)) {
+							metadata = newData;
+							logger.info("Metadata value changed to: " + metadata);
+						}
+					} catch (KeeperException e) {
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			});
 			logger.info("Connected to ZooKeeper");
 		}
 		catch (IOException ex) {
 			logger.error("Failed to connect to ZooKeeper");
 			return false;
 		}
+
+		// Create a znode to register the server with path /servers/server-<ip:port> and data <ip:port>
+		// try {
+		// 	String serverPath = "/servers/server-" + serverAddress + ":" + port;
+		// 	zk.create(serverPath, (serverAddress + ":" + port).getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+		// 	logger.info("Created znode " + serverPath);
+		// }
+		// catch (KeeperException ex) {
+		// 	logger.error("Failed to create znode");
+		// 	return false;
+		// }
+		// catch (InterruptedException ex) {
+		// 	logger.error("Failed to create znode");
+		// 	return false;
+		// }
 
 		return true;
 	}
