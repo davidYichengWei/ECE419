@@ -119,6 +119,10 @@ public class ECSClient implements IECSClient {
                 @Override
                 public void process(WatchedEvent event) {
                     try {
+                        // Create /servers znode if it doesn't exist
+                        if (zk.exists(serverListPath, true) == null) {
+                            createZnode(serverListPath, "initial server list");
+                        }
                         List<String> currentServers = zk.getChildren(serverListPath, true);
                         if (event.getType() == Event.EventType.NodeChildrenChanged 
                                 && event.getPath().equals(serverListPath)) {
@@ -143,10 +147,9 @@ public class ECSClient implements IECSClient {
             return false;
         }
 
-        // Create metadata and /servers znode
+        // Create metadata znode
 		createZnode(metadataPath, "initial metadata");
-        createZnode(serverListPath, "initial server list");
-
+        
         return true;
     }
 
