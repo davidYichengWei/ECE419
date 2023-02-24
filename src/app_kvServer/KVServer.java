@@ -162,24 +162,9 @@ public class KVServer implements IKVServer, Runnable {
 		logger.info("Server stopped.");
 	}
 
-	/**
-	 * Initializes the server on a given port
-	 */
-	private boolean initializeServer() {
-		logger.info("Initialize server ...");
-		try {
-			serverSocket = new ServerSocket(port);
-			logger.info("Server listening on port: "
-					+ serverSocket.getLocalPort());
-		} catch (IOException e) {
-			logger.error("Error! Cannot open server socket:");
-			if(e instanceof BindException){
-				logger.error("Port " + port + " is already bound!");
-			}
-			return false;
-		}
-
-		// Connect to ZooKeeper and create a watcher on path /metadata
+	// Connect to Zookeeper, create a watcher for metadata changes, and create a znode for the KVServer
+	private boolean initializeZooKeeper() {
+		// Connect to Zookeeper, create a watcher for metadata changes
 		try {
 			zk = new ZooKeeper("localhost:2181", 3000, new Watcher() {
 				@Override
@@ -204,20 +189,49 @@ public class KVServer implements IKVServer, Runnable {
 			return false;
 		}
 
-		// Create a znode to register the server with path /servers/server-<ip:port> and data <ip:port>
-		// try {
-		// 	String serverPath = "/servers/server-" + serverAddress + ":" + port;
-		// 	zk.create(serverPath, (serverAddress + ":" + port).getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
-		// 	logger.info("Created znode " + serverPath);
-		// }
-		// catch (KeeperException ex) {
-		// 	logger.error("Failed to create znode");
-		// 	return false;
-		// }
-		// catch (InterruptedException ex) {
-		// 	logger.error("Failed to create znode");
-		// 	return false;
-		// }
+		// Create a znode for the KVServer under path /servers
+		// path: /servers/server-<ip:port>
+		// value: <ip:port>
+		try {
+			String serverPath = "/servers/" + serverAddress + ":" + port;
+			if (zk.exists(serverPath, false) == null) {
+				zk.create(serverPath, (serverAddress + ":" + port).getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+				logger.info("Created znode for server: " + serverPath);
+			}
+		}
+		catch (KeeperException ex) {
+			logger.error("Failed to create znode for server");
+			return false;
+		}
+		catch (InterruptedException ex) {
+			logger.error("Failed to create znode for server");
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Initializes the server on a given port
+	 */
+	private boolean initializeServer() {
+		logger.info("Initialize server ...");
+		try {
+			serverSocket = new ServerSocket(port);
+			logger.info("Server listening on port: "
+					+ serverSocket.getLocalPort());
+		} catch (IOException e) {
+			logger.error("Error! Cannot open server socket:");
+			if(e instanceof BindException){
+				logger.error("Port " + port + " is already bound!");
+			}
+			return false;
+		}
+
+		// Connect to ZooKeeper and create a watcher on path /metadata
+		if (initializeZooKeeper() == false) {
+			return false;
+		}
 
 		return true;
 	}

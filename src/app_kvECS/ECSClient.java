@@ -1,7 +1,9 @@
 package app_kvECS;
 
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import ecs.IECSNode;
 
@@ -33,6 +35,8 @@ public class ECSClient implements IECSClient {
 
     private ZooKeeper zk;
     private final String metadataPath = "/metadata";
+    private final String serverListPath = "/servers";
+    private List<String> serverList;
 
     private boolean running;
     private ServerSocket serverSocket;
@@ -103,6 +107,49 @@ public class ECSClient implements IECSClient {
         return null;
     }
 
+    private void processServerListChange(List<String> oldList, List<String> newList) {
+        // TODO
+        System.out.println("Process server list change");
+    }
+
+    private boolean initializeZooKeeper() {
+        // Connect to ZooKeeper and create a watcher on path /servers to watch for KVServer nodes
+        try {
+            zk = new ZooKeeper("localhost:2181", 5000, new Watcher() {
+                @Override
+                public void process(WatchedEvent event) {
+                    try {
+                        List<String> currentServers = zk.getChildren(serverListPath, true);
+                        if (event.getType() == Event.EventType.NodeChildrenChanged 
+                                && event.getPath().equals(serverListPath)) {
+                            String serverListString = String.join(" ", currentServers);
+                            logger.info("Server list changed!");
+                            logger.info("Server list: " + serverListString);
+
+                            processServerListChange(serverList, currentServers);
+                            serverList = currentServers;
+                        }
+                    } catch (KeeperException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            logger.info("Connected to ZooKeeper and created watcher on path /servers");
+        } catch (IOException e) {
+            logger.error("Error! Cannot open server socket:");
+            if(e instanceof BindException){
+                logger.error("Port " + port + " is already bound!");
+            }
+            return false;
+        }
+
+        // Create metadata and /servers znode
+		createZnode(metadataPath, "initial metadata");
+        createZnode(serverListPath, "initial server list");
+
+        return true;
+    }
+
     /**
 	 * Initializes ECS on a given port
 	 */
@@ -114,8 +161,6 @@ public class ECSClient implements IECSClient {
 			serverSocket = new ServerSocket(port);
 			logger.info("Server listening on port: "
 					+ serverSocket.getLocalPort());
-            zk = new ZooKeeper("localhost:2181", 5000, null);
-            logger.info("Connected to ZooKeeper");
 
 		} catch (IOException e) {
 			logger.error("Error! Cannot open server socket:");
@@ -125,27 +170,9 @@ public class ECSClient implements IECSClient {
 			return false;
 		}
 
-        // Create metadata znode
-		try {
-            byte[] data = "initial metadata".getBytes();
-            zk.create(metadataPath, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-            System.out.println("ZNode created successfully!");
-        } catch (KeeperException.NodeExistsException e) {
-            System.out.println("ZNode already exists, updating data...");
-            setZkData(metadataPath, "initial metadata");
-        } catch (KeeperException e) {
-            System.err.println("Failed to create znode: " + e.getMessage());
-
-        } catch (Exception ex) {
-            logger.error(ex);
+        if (initializeZooKeeper() == false) {
+            return false;
         }
-
-        // Create /servers znode
-
-        // Create a watcher for path /servers
-		ServerWatcher watcher = new ServerWatcher(metadataPath, this);
-		logger.info("Wathcer created");
-
 
         return true;
 	}
@@ -168,6 +195,21 @@ public class ECSClient implements IECSClient {
             zk.setData(path, b, zk.exists(path, true).getVersion());
         } catch (KeeperException e) {
             System.err.println("Failed to update znode data: " + e.getMessage());
+        } catch (Exception ex) {
+            logger.error(ex);
+        }
+    }
+
+    public void createZnode(String path, String data) {
+        try {
+            byte[] b = data.getBytes();
+            zk.create(path, b, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+            logger.info("Created znode: " + path + " with data: " + data);
+        } catch (KeeperException.NodeExistsException e) {
+            System.out.println("ZNode already exists, updating data...");
+            setZkData(path, data);
+        } catch (KeeperException e) {
+            System.err.println("Failed to create znode: " + e.getMessage());
         } catch (Exception ex) {
             logger.error(ex);
         }
