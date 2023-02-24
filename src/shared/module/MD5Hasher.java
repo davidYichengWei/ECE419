@@ -1,5 +1,8 @@
 package shared.module;
 
+import ecs.ECSNode;
+import shared.messages.Metadata;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -21,5 +24,26 @@ public class MD5Hasher {
             System.out.println(e.getMessage());
         }
         return null;
+    }
+    public static String buildKeyRangeMessage(String listOfHostPorts) {
+        Metadata M = new Metadata(listOfHostPorts);
+        StringBuilder sb = new StringBuilder();
+        for (ECSNode node : M.getTree()) {
+            String KRFrom = node.getNodeHashRange()[0];
+            String KRTo = node.getNodeHashRange()[1];
+            sb.append(KRFrom)
+                .append(", ")
+                .append(KRTo)
+                .append(", ")
+                .append(KRTo)
+                .append(", ")
+                .append(node.getNodeHost())
+                .append(":")
+                .append(node.getNodePort())
+                .append(" ")
+                .append("; ");
+        }
+        String keyRangeMessage = sb.toString().trim();
+        return keyRangeMessage;
     }
 }
