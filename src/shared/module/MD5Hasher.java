@@ -26,6 +26,10 @@ public class MD5Hasher {
         return null;
     }
     public static String buildKeyRangeMessage(String listOfHostPorts) {
+        if (listOfHostPorts.length() == 0) {
+            return null;
+        }
+
         Metadata M = new Metadata(listOfHostPorts);
         StringBuilder sb = new StringBuilder();
         for (ECSNode node : M.getTree()) {
@@ -35,12 +39,9 @@ public class MD5Hasher {
                 .append(", ")
                 .append(KRTo)
                 .append(", ")
-                .append(KRTo)
-                .append(", ")
                 .append(node.getNodeHost())
                 .append(":")
                 .append(node.getNodePort())
-                .append(" ")
                 .append("; ");
         }
         String keyRangeMessage = sb.toString().trim();

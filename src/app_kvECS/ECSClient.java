@@ -10,6 +10,8 @@ import java.util.Set;
 import ecs.IECSNode;
 import ecs.ECSNode;
 import shared.messages.Metadata;
+import shared.messages.ECSMessage;
+import shared.module.MD5Hasher;
 
 import logger.LogSetup;
 import org.apache.log4j.Level;
@@ -170,7 +172,31 @@ public class ECSClient implements IECSClient {
         }
 
         // Send metadata to target servers in the list
-        
+        String listOfHostPorts = String.join(" ", newList);
+        String metadata = MD5Hasher.buildKeyRangeMessage(listOfHostPorts);
+        System.out.println("listOfHostPorts: " + listOfHostPorts);
+        System.out.println("Metadata: " + metadata);
+
+        for (int i = 0; i < targetServers.size(); i++) {
+            String[] hostPort = targetServers.get(i).split(":");
+            String host = hostPort[0];
+            int port = Integer.parseInt(hostPort[1]);
+
+            // Build ECSMessage
+            String serverToContact = null;
+            if (targetServers.size() > 1) {
+                if (i == 0) {
+                    serverToContact = targetServers.get(1);
+                } else {
+                    serverToContact = targetServers.get(0);
+                }
+            }
+            ECSMessage message = new ECSMessage(ECSMessage.ECSMessageStatus.TRANSFER_BEGIN, metadata, serverToContact);
+
+            ECSKVServerConnection connection = new ECSKVServerConnection(host, port, message);
+            logger.info("Start a thread to send metadata to " + host + ":" + port);
+            new Thread(connection).start();
+        }
     }
 
     private boolean initializeZooKeeper() {
@@ -191,6 +217,7 @@ public class ECSClient implements IECSClient {
                             logger.info("Server list changed!");
                             logger.info("Server list: " + serverListString);
 
+                            // Send updated metadata to corresponding KVServers based on server list change
                             processServerListChange(serverList, currentServers);
                             serverList = currentServers;
                         }
@@ -288,7 +315,7 @@ public class ECSClient implements IECSClient {
 		running = initializeECS();
 
         while(isRunning()) {
-            int tmp = 1;
+            // Do nothing
         }
         
 

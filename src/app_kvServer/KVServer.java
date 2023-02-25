@@ -233,6 +233,20 @@ public class KVServer implements IKVServer, Runnable {
 			return false;
 		}
 
+		// Test: update metadata to address:port
+		// Result: it's working
+		// try {
+		// 	zk.setData(metadataPath, (serverAddress + ":" + port).getBytes(), zk.exists(metadataPath, true).getVersion());
+		// }
+		// catch (KeeperException ex) {
+		// 	logger.error("Failed to update metadata");
+		// 	return false;
+		// }
+		// catch (InterruptedException ex) {
+		// 	logger.error("Failed to update metadata");
+		// 	return false;
+		// }
+
 		return true;
 	}
 

@@ -6,10 +6,10 @@ import java.io.Serializable;
 public class ECSMessage implements Serializable {
     public enum ECSMessageStatus {
 		TRANSFER_BEGIN, 	/* From ECS -> KVServer */
-		TRANSFER_DONE 		/* From KVServer -> ECS */
+		TRANSFER_ACK 		/* From KVServer -> ECS to acknowledge */
 	}
 
-    private String metadata; // Updated metadata, null if status is TRANSFER_DONE
+    private String metadata; // Updated metadata, null if status is TRANSFER_ACK
     private ECSMessageStatus status;
     // Server to contact for data transfer, only needed if status is TRANSFER_BEGIN
     // and there are 2 servers involved
