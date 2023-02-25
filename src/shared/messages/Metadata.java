@@ -2,16 +2,20 @@ package shared.messages;
 
 import ecs.ECSNode;
 
+import java.util.Comparator;
 import java.util.TreeSet;
 
 public class Metadata implements IMetadata{
     private TreeSet<ECSNode> tree;
 
     public Metadata(String listOfHostPorts) {
-        this.tree = new TreeSet<>((Node1, Node2) -> {
-            String KeyRangeTo1 = Node1.getNodeHashRange()[1];
-            String KeyRangeTo2 = Node2.getNodeHashRange()[1];
-            return KeyRangeTo1.compareTo(KeyRangeTo2);
+        this.tree = new TreeSet<>(new Comparator<ECSNode>() {
+            @Override
+            public int compare(ECSNode Node1, ECSNode Node2) {
+                String KeyRangeTo1 = Node1.getNodeHashRange()[1];
+                String KeyRangeTo2 = Node2.getNodeHashRange()[1];
+                return KeyRangeTo1.compareTo(KeyRangeTo2);
+            }
         });
         String[] hostPorts = listOfHostPorts.split(" ");
         // Insert all Servers into tree
