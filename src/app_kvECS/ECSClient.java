@@ -4,8 +4,12 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import ecs.IECSNode;
+import ecs.ECSNode;
+import shared.messages.Metadata;
 
 import logger.LogSetup;
 import org.apache.log4j.Level;
@@ -36,7 +40,7 @@ public class ECSClient implements IECSClient {
     private ZooKeeper zk;
     private final String metadataPath = "/metadata";
     private final String serverListPath = "/servers";
-    private List<String> serverList;
+    private List<String>  serverList = new ArrayList<>();
 
     private boolean running;
     private ServerSocket serverSocket;
@@ -107,9 +111,66 @@ public class ECSClient implements IECSClient {
         return null;
     }
 
-    private void processServerListChange(List<String> oldList, List<String> newList) {
-        // TODO
+    // Find the server to be added/removed from the list and its successor in the ring,
+    // return a list [server, successor]
+    // If the server is the first to be added or last ro be removed, return [server]
+    public List<String> findTargetServers(List<String> oldList, List<String> newList) {
+        List<String> result = new ArrayList<>();
+        if (oldList.size() == 0) {
+            return newList;
+        }
+        if (newList.size() == 0) {
+            return oldList;
+        }
+
+        // Find server to be added/removed
+        HashSet<String> set = new HashSet<>();
+
+        assert oldList.size() != newList.size();
+        if (oldList.size() < newList.size()) {
+            set.addAll(oldList);
+            for (String server : newList) {
+                if (!set.contains(server)) {
+                    result.add(server);
+                }
+            }
+        } else {
+            set.addAll(newList);
+            for (String server : oldList) {
+                if (!set.contains(server)) {
+                    result.add(server);
+                }
+            }
+        }
+
+        // Find successor of the server to be added/removed
+        String listOfHostPorts = "";
+        if (oldList.size() < newList.size()) {
+            listOfHostPorts = String.join(" ", oldList);
+        } else {
+            listOfHostPorts = String.join(" ", newList);
+        }
+        Metadata metadata = new Metadata(listOfHostPorts);
+        ECSNode successorNode = metadata.findNode(result.get(0));
+        if (successorNode != null) {
+            String successor = successorNode.getNodeHost() + ":" + successorNode.getNodePort();
+            result.add(successor);
+        }
+
+        return result;
+    }
+
+    public void processServerListChange(List<String> oldList, List<String> newList) {
         System.out.println("Process server list change");
+
+        List<String> targetServers = findTargetServers(oldList, newList);
+        System.out.println("Server added/removed: " + targetServers.get(0));
+        if (targetServers.size() == 2) {
+            System.out.println("Its successor: " + targetServers.get(1));
+        }
+
+        // Send metadata to target servers in the list
+        
     }
 
     private boolean initializeZooKeeper() {
