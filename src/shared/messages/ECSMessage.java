@@ -15,7 +15,7 @@ public class ECSMessage implements Serializable {
     // and there are 2 servers involved
     private String serverToContact;
 
-    private static final String DELIMITER = " ";
+    private static final String DELIMITER = "@";
     private static final char LINE_FEED = 0x0A;
     private static final char RETURN = 0x0D;
 
