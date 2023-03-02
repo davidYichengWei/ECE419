@@ -36,15 +36,34 @@ public class MD5Hasher {
             String KRFrom = node.getNodeHashRange()[0];
             String KRTo = node.getNodeHashRange()[1];
             sb.append(KRFrom)
-                .append(", ")
-                .append(KRTo)
-                .append(", ")
-                .append(node.getNodeHost())
-                .append(":")
-                .append(node.getNodePort())
-                .append("; ");
+                    .append(", ")
+                    .append(KRTo)
+                    .append(", ")
+                    .append(node.getNodeHost())
+                    .append(":")
+                    .append(node.getNodePort())
+                    .append("; ");
         }
         String keyRangeMessage = sb.toString().trim();
         return keyRangeMessage;
     }
+
+    public static String buildListOfPorts(String keyRangeMessage) {
+        if (keyRangeMessage.length() == 0) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        String[] nodes = keyRangeMessage.split(";");
+
+        for (String node : nodes) {
+            String[] values = node.split(",");
+            String ipPort = values[2].trim();
+            sb.append(ipPort).append(" ");
+        }
+
+        String listOfPorts = sb.toString().trim();
+        return listOfPorts;
+    }
+
+
 }
