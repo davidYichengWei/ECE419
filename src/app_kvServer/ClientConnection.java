@@ -80,24 +80,7 @@ public class ClientConnection implements Runnable {
                 }
                 catch (IllegalArgumentException iae) {
                     logger.error("Error! Unable to parse message", iae);
-                    // logger.error("Error! Unable to parse message as KVMessage");
-                    // logger.info("Trying to parse the message as ECSMessage");
-                    // try {
-                    //     ECSMessage ecsMessage = new ECSMessage(messageBytes);
-                    //     System.out.println("ECSMessage received: " + ecsMessage.getStatus() + " " 
-                    //         + ecsMessage.getMetadata() + " " + ecsMessage.getServerToContact());
-                        
-                    //     // Reply to ECS server with TRANSFER_ACK
-                    //     ECSMessage ecsReply = new ECSMessage(ECSMessage.ECSMessageStatus.TRANSFER_ACK, null, null);
-                    //     sendECSMessage(ecsReply);
-
-                    //     // Begin transfer of data
-                    // } catch (IllegalArgumentException iae2) {
-                    //     logger.error("Error! Unable to parse message as ECSMessage", iae2);
-                    //     sendFailedMessage("FAILED Message format unknown!");
-                    // } catch (IOException ioe) {
-                    //     logger.error("Error! Unable to send ECSMessage", ioe);
-                    // }
+                    sendFailedMessage("FAILED Message format unknown!");
                 }
                 catch (IOException ioe) {
                     logger.error("Error! Connection lost!");
@@ -125,10 +108,12 @@ public class ClientConnection implements Runnable {
         }
     }
 
+    // Handle server data transfer message
     public void handleServerMessage() { // Takes ServerMessage as input
         // TODO
     }
 
+    // Handle ECS message, start data transfer if needed
     public void handleECSMessage(ECSMessage msg) {
         System.out.println("ECSMessage received: " + msg.getStatus() + " " 
             + msg.getMetadata() + " " + msg.getServerToContact());
@@ -141,6 +126,7 @@ public class ClientConnection implements Runnable {
         // TODO
     }
 
+    // Handle client request message
     public void handleClientMessage(Message msg) {
         logger.info("RECEIVE request from \t<"
                 + clientSocket.getInetAddress().getHostAddress() + ":"
@@ -160,13 +146,13 @@ public class ClientConnection implements Runnable {
                         status = KVMessage.StatusType.GET_ERROR;
                     }
 
-                    sendMessage(new Message(
+                    sendClientMessage(new Message(
                         msg.getKey(), value,
                         status));
                 }
                 catch (Exception ex) {
                     logger.error("GET ERROR", ex);
-                    sendMessage(new Message(
+                    sendClientMessage(new Message(
                         msg.getKey(), msg.getValue(),
                         KVMessage.StatusType.GET_ERROR));
                 }
@@ -200,7 +186,7 @@ public class ClientConnection implements Runnable {
                         status = KVMessage.StatusType.PUT_UPDATE;
                     }
 
-                    sendMessage(new Message(
+                    sendClientMessage(new Message(
                         msg.getKey(), msg.getValue(),
                         status));
                 }
@@ -210,7 +196,7 @@ public class ClientConnection implements Runnable {
                         errorStatus = KVMessage.StatusType.DELETE_ERROR;
                     }
                     logger.error("PUT ERROR", ex);
-                    sendMessage(new Message(
+                    sendClientMessage(new Message(
                         msg.getKey(), msg.getValue(),
                         errorStatus));
                 }
@@ -218,6 +204,7 @@ public class ClientConnection implements Runnable {
         }
     }
 
+    // Get the type of message received
     public MessageType getMessageType(byte[] msgBytes) {
         try {
             Message msg = new Message(msgBytes);
@@ -240,7 +227,7 @@ public class ClientConnection implements Runnable {
      * @param msg the message that is to be sent.
      * @throws IOException some I/O error regarding the output stream
      */
-    public void sendMessage(Message msg) {
+    public void sendClientMessage(Message msg) {
         try {
             byte[] msgBytes = msg.toByteArray();
             output.write(msgBytes, 0, msgBytes.length);
@@ -316,76 +303,6 @@ public class ClientConnection implements Runnable {
         msgBytes = tmp;
 
         return msgBytes;
-    }
-
-    /**
-     * Reads a Message object sent by the client.
-     * @throws IOException some I/O error regarding the output stream
-     * @throws ClassNotFoundException definition of the object received not found
-     */
-    private Message receiveMessage() throws IOException, ClassNotFoundException, IllegalArgumentException {
-        int index = 0;
-        byte[] msgBytes = null, tmp = null;
-        byte[] bufferBytes = new byte[BUFFER_SIZE];
-
-        /* read first char from stream */
-        byte read = (byte) input.read();
-        boolean reading = true;
-
-        while(read != 13 && reading) {/* carriage return */
-            /* if buffer filled, copy to msg array */
-            if(index == BUFFER_SIZE) {
-                if(msgBytes == null){
-                    tmp = new byte[BUFFER_SIZE];
-                    System.arraycopy(bufferBytes, 0, tmp, 0, BUFFER_SIZE);
-                } else {
-                    tmp = new byte[msgBytes.length + BUFFER_SIZE];
-                    System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
-                    System.arraycopy(bufferBytes, 0, tmp, msgBytes.length,
-                            BUFFER_SIZE);
-                }
-
-                msgBytes = tmp;
-                bufferBytes = new byte[BUFFER_SIZE];
-                index = 0;
-            }
-
-            /* only read valid characters, i.e. letters and numbers */
-            if((read >= 31 && read < 127)) {
-                bufferBytes[index] = read;
-                index++;
-            }
-
-            /* stop reading is DROP_SIZE is reached */
-            if(msgBytes != null && msgBytes.length + index >= DROP_SIZE) {
-                reading = false;
-            }
-
-            /* read next char from stream */
-            read = (byte) input.read();
-        }
-
-        if(msgBytes == null){
-            tmp = new byte[index];
-            System.arraycopy(bufferBytes, 0, tmp, 0, index);
-        } else {
-            tmp = new byte[msgBytes.length + index];
-            System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
-            System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, index);
-        }
-
-        msgBytes = tmp;
-
-        /* build final String */
-        Message msg = new Message(msgBytes);
-        logger.info("RECEIVE request from \t<"
-                + clientSocket.getInetAddress().getHostAddress() + ":"
-                + clientSocket.getPort() + ">: {"
-                + msg.getStatus() + ", <"
-                + msg.getKey() + ", "
-                + msg.getValue() + ">}");
-
-        return msg;
     }
 
     /**
