@@ -115,15 +115,27 @@ public class ClientConnection implements Runnable {
 
     // Handle ECS message, start data transfer if needed
     public void handleECSMessage(ECSMessage msg) {
+        String meta = msg.getMetadata();
+        String serverToCon = msg.getServerToContact();
         System.out.println("ECSMessage received: " + msg.getStatus() + " " 
             + msg.getMetadata() + " " + msg.getServerToContact());
         
         // Reply to ECS server with TRANSFER_ACK
         ECSMessage ecsReply = new ECSMessage(ECSMessage.ECSMessageStatus.TRANSFER_ACK, null, null);
         sendECSMessage(ecsReply);
-
+        synchronized (this) {
+            if (msg.getStatus() == ECSMessage.ECSMessageStatus.TRANSFER_BEGIN) {
+                try {
+                    Map<String, String> moved = this.server.moved_batch(meta);
+                }
+                catch (IOException ioe) {
+                    logger.error("Error! Unable to send KV pairs to another server!", ioe);
+                }
+            }
+        }
         // Begin transfer of data
         // TODO
+
     }
 
     // Handle client request message

@@ -1,135 +1,31 @@
 SLF4J: Class path contains multiple SLF4J bindings.
-SLF4J: Found binding in [jar:file:/Users/yichengwei/Desktop/2023%20Winter%20Term/ECE419/projects/zookeeper-3.4.11/build/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-SLF4J: Found binding in [jar:file:/Users/yichengwei/Desktop/2023%20Winter%20Term/ECE419/projects/zookeeper-3.4.11/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/build/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
 SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
-2023-02-22 22:21:19,201 [myid:] - INFO  [main:QuorumPeerConfig@136] - Reading configuration from: /Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../conf/zoo.cfg
-2023-02-22 22:21:19,206 [myid:] - INFO  [main:DatadirCleanupManager@78] - autopurge.snapRetainCount set to 3
-2023-02-22 22:21:19,206 [myid:] - INFO  [main:DatadirCleanupManager@79] - autopurge.purgeInterval set to 0
-2023-02-22 22:21:19,206 [myid:] - INFO  [main:DatadirCleanupManager@101] - Purge task is not scheduled.
-2023-02-22 22:21:19,208 [myid:] - WARN  [main:QuorumPeerMain@116] - Either no config or no quorum defined in config, running  in standalone mode
-2023-02-22 22:21:19,216 [myid:] - INFO  [main:QuorumPeerConfig@136] - Reading configuration from: /Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../conf/zoo.cfg
-2023-02-22 22:21:19,216 [myid:] - INFO  [main:ZooKeeperServerMain@98] - Starting server
-2023-02-22 22:21:19,233 [myid:] - INFO  [main:Environment@100] - Server environment:zookeeper.version=3.4.11-37e277162d567b55a07d1755f0b31c32e93c01a0, built on 11/01/2017 18:06 GMT
-2023-02-22 22:21:19,233 [myid:] - INFO  [main:Environment@100] - Server environment:host.name=192.168.2.15
-2023-02-22 22:21:19,233 [myid:] - INFO  [main:Environment@100] - Server environment:java.version=17.0.6
-2023-02-22 22:21:19,233 [myid:] - INFO  [main:Environment@100] - Server environment:java.vendor=Eclipse Adoptium
-2023-02-22 22:21:19,233 [myid:] - INFO  [main:Environment@100] - Server environment:java.home=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
-2023-02-22 22:21:19,233 [myid:] - INFO  [main:Environment@100] - Server environment:java.class.path=/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/classes:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/slf4j-log4j12-1.6.1.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/slf4j-api-1.6.1.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/netty-3.10.5.Final.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/log4j-1.2.16.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/jline-0.9.94.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/audience-annotations-0.5.0.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/slf4j-log4j12-1.6.1.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/slf4j-api-1.6.1.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/netty-3.10.5.Final.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/log4j-1.2.16.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/jline-0.9.94.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/audience-annotations-0.5.0.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../zookeeper-3.4.11.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../src/java/lib/ivy-2.4.0.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../conf:
-2023-02-22 22:21:19,233 [myid:] - INFO  [main:Environment@100] - Server environment:java.library.path=/Users/yichengwei/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
-2023-02-22 22:21:19,233 [myid:] - INFO  [main:Environment@100] - Server environment:java.io.tmpdir=/var/folders/kg/1jpwrpv90cs8jj7rnj4tffqc0000gn/T/
-2023-02-22 22:21:19,234 [myid:] - INFO  [main:Environment@100] - Server environment:java.compiler=<NA>
-2023-02-22 22:21:19,235 [myid:] - INFO  [main:Environment@100] - Server environment:os.name=Mac OS X
-2023-02-22 22:21:19,235 [myid:] - INFO  [main:Environment@100] - Server environment:os.arch=x86_64
-2023-02-22 22:21:19,235 [myid:] - INFO  [main:Environment@100] - Server environment:os.version=13.1
-2023-02-22 22:21:19,235 [myid:] - INFO  [main:Environment@100] - Server environment:user.name=yichengwei
-2023-02-22 22:21:19,235 [myid:] - INFO  [main:Environment@100] - Server environment:user.home=/Users/yichengwei
-2023-02-22 22:21:19,235 [myid:] - INFO  [main:Environment@100] - Server environment:user.dir=/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin
-2023-02-22 22:21:19,242 [myid:] - INFO  [main:ZooKeeperServer@825] - tickTime set to 2000
-2023-02-22 22:21:19,243 [myid:] - INFO  [main:ZooKeeperServer@834] - minSessionTimeout set to -1
-2023-02-22 22:21:19,244 [myid:] - INFO  [main:ZooKeeperServer@843] - maxSessionTimeout set to -1
-2023-02-22 22:21:19,255 [myid:] - INFO  [main:ServerCnxnFactory@117] - Using org.apache.zookeeper.server.NIOServerCnxnFactory as server connection factory
-2023-02-22 22:21:19,260 [myid:] - INFO  [main:NIOServerCnxnFactory@89] - binding to port 0.0.0.0/0.0.0.0:2181
-2023-02-22 22:21:23,112 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:57957
-2023-02-22 22:21:23,118 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ServerCnxn@324] - The list of known four letter word commands is : [{1936881266=srvr, 1937006964=stat, 2003003491=wchc, 1685417328=dump, 1668445044=crst, 1936880500=srst, 1701738089=envi, 1668247142=conf, 2003003507=wchs, 2003003504=wchp, 1668247155=cons, 1835955314=mntr, 1769173615=isro, 1920298859=ruok, 1735683435=gtmk, 1937010027=stmk}]
-2023-02-22 22:21:23,118 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ServerCnxn@325] - The list of enabled four letter word commands is : [[wchs, stat, stmk, conf, ruok, mntr, srvr, envi, srst, isro, dump, gtmk, crst, cons]]
-2023-02-22 22:21:23,118 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@892] - Processing srvr command from /127.0.0.1:57957
-2023-02-22 22:21:23,120 [myid:] - INFO  [Thread-0:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:57957 (no session established for client)
-2023-02-22 22:22:15,951 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:57970
-2023-02-22 22:22:15,953 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@892] - Processing srvr command from /127.0.0.1:57970
-2023-02-22 22:22:15,953 [myid:] - INFO  [Thread-1:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:57970 (no session established for client)
-2023-02-22 22:22:24,496 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:57971
-2023-02-22 22:22:24,497 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@892] - Processing srvr command from /127.0.0.1:57971
-2023-02-22 22:22:24,498 [myid:] - INFO  [Thread-2:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:57971 (no session established for client)
-2023-02-22 22:31:15,238 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:58119
-2023-02-22 22:31:15,241 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@892] - Processing srvr command from /127.0.0.1:58119
-2023-02-22 22:31:15,242 [myid:] - INFO  [Thread-3:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:58119 (no session established for client)
-2023-02-22 22:47:33,294 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:58304
-2023-02-22 22:47:33,296 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@892] - Processing srvr command from /127.0.0.1:58304
-2023-02-22 22:47:33,297 [myid:] - INFO  [Thread-4:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:58304 (no session established for client)
-2023-02-22 22:48:34,439 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:58338
-2023-02-22 22:48:34,450 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /127.0.0.1:58338
-2023-02-22 22:48:34,455 [myid:] - INFO  [SyncThread:0:FileTxnLog@209] - Creating new log file: log.1
-2023-02-22 22:48:34,480 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b0000 with negotiated timeout 5000 for client /127.0.0.1:58338
-2023-02-22 22:48:34,911 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b0000, likely client has closed socket
-2023-02-22 22:48:34,914 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:58338 which had sessionid 0x10074ced78b0000
-2023-02-22 22:48:40,603 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b0000, timeout of 5000ms exceeded
-2023-02-22 22:48:40,605 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b0000
-2023-02-22 22:49:20,328 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /[0:0:0:0:0:0:0:1]:58344
-2023-02-22 22:49:20,332 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /[0:0:0:0:0:0:0:1]:58344
-2023-02-22 22:49:20,339 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b0001 with negotiated timeout 5000 for client /[0:0:0:0:0:0:0:1]:58344
-2023-02-22 22:49:20,350 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@653] - Got user-level KeeperException when processing sessionid:0x10074ced78b0001 type:create cxid:0x1 zxid:0x5 txntype:-1 reqpath:n/a Error Path:/metadata Error:KeeperErrorCode = NodeExists for /metadata
-2023-02-22 22:49:20,766 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b0001, likely client has closed socket
-2023-02-22 22:49:20,768 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /[0:0:0:0:0:0:0:1]:58344 which had sessionid 0x10074ced78b0001
-2023-02-22 22:49:26,596 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b0001, timeout of 5000ms exceeded
-2023-02-22 22:49:26,596 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b0001
-2023-02-22 22:51:44,798 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /[0:0:0:0:0:0:0:1]:58408
-2023-02-22 22:51:44,804 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /[0:0:0:0:0:0:0:1]:58408
-2023-02-22 22:51:44,810 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b0002 with negotiated timeout 5000 for client /[0:0:0:0:0:0:0:1]:58408
-2023-02-22 22:51:44,819 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@653] - Got user-level KeeperException when processing sessionid:0x10074ced78b0002 type:create cxid:0x1 zxid:0x8 txntype:-1 reqpath:n/a Error Path:/metadata Error:KeeperErrorCode = NodeExists for /metadata
-2023-02-22 22:51:45,240 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b0002, likely client has closed socket
-2023-02-22 22:51:45,241 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /[0:0:0:0:0:0:0:1]:58408 which had sessionid 0x10074ced78b0002
-2023-02-22 22:51:50,589 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b0002, timeout of 5000ms exceeded
-2023-02-22 22:51:50,590 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b0002
-2023-02-22 22:53:16,358 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:58430
-2023-02-22 22:53:16,360 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@892] - Processing srvr command from /127.0.0.1:58430
-2023-02-22 22:53:16,360 [myid:] - INFO  [Thread-5:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:58430 (no session established for client)
-2023-02-22 22:53:36,818 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:58435
-2023-02-22 22:53:36,827 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /127.0.0.1:58435
-2023-02-22 22:53:36,836 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b0003 with negotiated timeout 30000 for client /127.0.0.1:58435
-2023-02-22 22:54:29,407 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /[0:0:0:0:0:0:0:1]:58440
-2023-02-22 22:54:29,413 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /[0:0:0:0:0:0:0:1]:58440
-2023-02-22 22:54:29,419 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b0004 with negotiated timeout 5000 for client /[0:0:0:0:0:0:0:1]:58440
-2023-02-22 22:54:29,428 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@653] - Got user-level KeeperException when processing sessionid:0x10074ced78b0004 type:create cxid:0x1 zxid:0xd txntype:-1 reqpath:n/a Error Path:/metadata Error:KeeperErrorCode = NodeExists for /metadata
-2023-02-22 22:54:29,841 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b0004, likely client has closed socket
-2023-02-22 22:54:29,842 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /[0:0:0:0:0:0:0:1]:58440 which had sessionid 0x10074ced78b0004
-2023-02-22 22:54:34,586 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b0004, timeout of 5000ms exceeded
-2023-02-22 22:54:34,587 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b0004
-2023-02-22 23:06:40,126 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /[0:0:0:0:0:0:0:1]:58632
-2023-02-22 23:06:40,130 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /[0:0:0:0:0:0:0:1]:58632
-2023-02-22 23:06:40,138 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b0005 with negotiated timeout 5000 for client /[0:0:0:0:0:0:0:1]:58632
-2023-02-22 23:06:57,718 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b0005, likely client has closed socket
-2023-02-22 23:06:57,720 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /[0:0:0:0:0:0:0:1]:58632 which had sessionid 0x10074ced78b0005
-2023-02-22 23:07:02,580 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b0005, timeout of 5000ms exceeded
-2023-02-22 23:07:02,581 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b0005
-2023-02-22 23:41:27,316 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:59328
-2023-02-22 23:41:27,320 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /127.0.0.1:59328
-2023-02-22 23:41:27,327 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b0006 with negotiated timeout 5000 for client /127.0.0.1:59328
-2023-02-22 23:41:27,342 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:59329
-2023-02-22 23:41:27,343 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /127.0.0.1:59329
-2023-02-22 23:41:27,349 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b0007 with negotiated timeout 5000 for client /127.0.0.1:59329
-2023-02-22 23:42:28,127 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b0007, likely client has closed socket
-2023-02-22 23:42:28,129 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:59329 which had sessionid 0x10074ced78b0007
-2023-02-22 23:42:28,132 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b0006, likely client has closed socket
-2023-02-22 23:42:28,134 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:59328 which had sessionid 0x10074ced78b0006
-2023-02-22 23:42:32,548 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b0007, timeout of 5000ms exceeded
-2023-02-22 23:42:32,549 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b0006, timeout of 5000ms exceeded
-2023-02-22 23:42:32,550 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b0007
-2023-02-22 23:42:32,550 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b0006
-2023-02-22 23:42:57,427 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:59360
-2023-02-22 23:42:57,431 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /127.0.0.1:59360
-2023-02-22 23:42:57,437 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b0008 with negotiated timeout 5000 for client /127.0.0.1:59360
-2023-02-22 23:42:57,450 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /[0:0:0:0:0:0:0:1]:59361
-2023-02-22 23:42:57,451 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /[0:0:0:0:0:0:0:1]:59361
-2023-02-22 23:42:57,456 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b0009 with negotiated timeout 5000 for client /[0:0:0:0:0:0:0:1]:59361
-2023-02-22 23:43:49,913 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:59369
-2023-02-22 23:43:49,917 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /127.0.0.1:59369
-2023-02-22 23:43:49,923 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b000a with negotiated timeout 5000 for client /127.0.0.1:59369
-2023-02-22 23:43:49,938 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /[0:0:0:0:0:0:0:1]:59370
-2023-02-22 23:43:49,940 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /[0:0:0:0:0:0:0:1]:59370
-2023-02-22 23:43:49,944 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x10074ced78b000b with negotiated timeout 5000 for client /[0:0:0:0:0:0:0:1]:59370
-2023-02-22 23:44:02,253 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b000b, likely client has closed socket
-2023-02-22 23:44:02,255 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /[0:0:0:0:0:0:0:1]:59370 which had sessionid 0x10074ced78b000b
-2023-02-22 23:44:02,255 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b000a, likely client has closed socket
-2023-02-22 23:44:02,256 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:59369 which had sessionid 0x10074ced78b000a
-2023-02-22 23:44:04,311 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b0009, likely client has closed socket
-2023-02-22 23:44:04,312 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /[0:0:0:0:0:0:0:1]:59361 which had sessionid 0x10074ced78b0009
-2023-02-22 23:44:04,313 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x10074ced78b0008, likely client has closed socket
-2023-02-22 23:44:04,314 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:59360 which had sessionid 0x10074ced78b0008
-2023-02-22 23:44:06,546 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b000a, timeout of 5000ms exceeded
-2023-02-22 23:44:06,546 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b000a
-2023-02-22 23:44:08,546 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b0008, timeout of 5000ms exceeded
-2023-02-22 23:44:08,547 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b0009, timeout of 5000ms exceeded
-2023-02-22 23:44:08,547 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x10074ced78b000b, timeout of 5000ms exceeded
-2023-02-22 23:44:08,547 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b0008
-2023-02-22 23:44:08,547 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b0009
-2023-02-22 23:44:08,548 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x10074ced78b000b
+2023-03-02 15:26:39,507 [myid:] - INFO  [main:QuorumPeerConfig@136] - Reading configuration from: /Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../conf/zoo.cfg
+2023-03-02 15:26:39,511 [myid:] - INFO  [main:DatadirCleanupManager@78] - autopurge.snapRetainCount set to 3
+2023-03-02 15:26:39,511 [myid:] - INFO  [main:DatadirCleanupManager@79] - autopurge.purgeInterval set to 0
+2023-03-02 15:26:39,511 [myid:] - INFO  [main:DatadirCleanupManager@101] - Purge task is not scheduled.
+2023-03-02 15:26:39,511 [myid:] - WARN  [main:QuorumPeerMain@116] - Either no config or no quorum defined in config, running  in standalone mode
+2023-03-02 15:26:39,523 [myid:] - INFO  [main:QuorumPeerConfig@136] - Reading configuration from: /Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../conf/zoo.cfg
+2023-03-02 15:26:39,523 [myid:] - INFO  [main:ZooKeeperServerMain@98] - Starting server
+2023-03-02 15:26:39,532 [myid:] - INFO  [main:Environment@100] - Server environment:zookeeper.version=3.4.11-37e277162d567b55a07d1755f0b31c32e93c01a0, built on 11/01/2017 18:06 GMT
+2023-03-02 15:26:39,532 [myid:] - INFO  [main:Environment@100] - Server environment:host.name=localhost
+2023-03-02 15:26:39,532 [myid:] - INFO  [main:Environment@100] - Server environment:java.version=13.0.1
+2023-03-02 15:26:39,532 [myid:] - INFO  [main:Environment@100] - Server environment:java.vendor=Oracle Corporation
+2023-03-02 15:26:39,532 [myid:] - INFO  [main:Environment@100] - Server environment:java.home=/Library/Java/JavaVirtualMachines/jdk-13.0.1.jdk/Contents/Home
+2023-03-02 15:26:39,532 [myid:] - INFO  [main:Environment@100] - Server environment:java.class.path=/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/classes:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/slf4j-log4j12-1.6.1.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/slf4j-api-1.6.1.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/netty-3.10.5.Final.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/log4j-1.2.16.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/jline-0.9.94.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/audience-annotations-0.5.0.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/slf4j-log4j12-1.6.1.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/slf4j-api-1.6.1.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/netty-3.10.5.Final.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/log4j-1.2.16.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/jline-0.9.94.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/audience-annotations-0.5.0.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../zookeeper-3.4.11.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../src/java/lib/ivy-2.4.0.jar:/Users/beale/desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../conf:
+2023-03-02 15:26:39,532 [myid:] - INFO  [main:Environment@100] - Server environment:java.library.path=/Users/beale/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
+2023-03-02 15:26:39,532 [myid:] - INFO  [main:Environment@100] - Server environment:java.io.tmpdir=/var/folders/8m/5192gf297sj29r3nsqzpn7jr0000gn/T/
+2023-03-02 15:26:39,532 [myid:] - INFO  [main:Environment@100] - Server environment:java.compiler=<NA>
+2023-03-02 15:26:39,533 [myid:] - INFO  [main:Environment@100] - Server environment:os.name=Mac OS X
+2023-03-02 15:26:39,533 [myid:] - INFO  [main:Environment@100] - Server environment:os.arch=x86_64
+2023-03-02 15:26:39,533 [myid:] - INFO  [main:Environment@100] - Server environment:os.version=10.16
+2023-03-02 15:26:39,533 [myid:] - INFO  [main:Environment@100] - Server environment:user.name=beale
+2023-03-02 15:26:39,533 [myid:] - INFO  [main:Environment@100] - Server environment:user.home=/Users/beale
+2023-03-02 15:26:39,533 [myid:] - INFO  [main:Environment@100] - Server environment:user.dir=/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin
+2023-03-02 15:26:39,539 [myid:] - INFO  [main:ZooKeeperServer@825] - tickTime set to 2000
+2023-03-02 15:26:39,539 [myid:] - INFO  [main:ZooKeeperServer@834] - minSessionTimeout set to -1
+2023-03-02 15:26:39,539 [myid:] - INFO  [main:ZooKeeperServer@843] - maxSessionTimeout set to -1
+2023-03-02 15:26:39,550 [myid:] - INFO  [main:ServerCnxnFactory@117] - Using org.apache.zookeeper.server.NIOServerCnxnFactory as server connection factory
+2023-03-02 15:26:39,556 [myid:] - INFO  [main:NIOServerCnxnFactory@89] - binding to port 0.0.0.0/0.0.0.0:2181

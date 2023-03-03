@@ -7,6 +7,7 @@ public class ECSMessage implements Serializable {
     public enum ECSMessageStatus {
 		TRANSFER_BEGIN, 	/* From ECS -> KVServer */
 		TRANSFER_ACK 		/* From KVServer -> ECS to acknowledge */
+        
 	}
 
     private String metadata; // Updated metadata, null if status is TRANSFER_ACK

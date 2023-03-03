@@ -8,7 +8,7 @@ import javax.swing.plaf.metal.MetalIconFactory.FileIcon16;
 
 import app_kvServer.storage.IFileStorage;
 
-
+import shared.module.MD5Hasher;
 public class FileStorage implements IFileStorage{
     private static Logger logger = Logger.getRootLogger();
     public final String file_path;
@@ -109,7 +109,18 @@ public class FileStorage implements IFileStorage{
 
         storeKVInFile();
     }
-    
+    public Map<String, String> move_batch(String[] hash_range){
+        String begin = hash_range[0];
+        String end = hash_range[1];
+        Map<String, String> movedKV = new HashMap<String, String>();
+        for(String i:hash_table.keySet()){
+            String HashKey = MD5Hasher.hash(i);
+            if (HashKey.compareTo(begin) >= 0 && HashKey.compareTo(end) <= 0) {
+                movedKV.put(i, hash_table.get(i));
+            }
+        }
+        return movedKV;
+    }
     @Override
     public String getKV(String key)
     {
