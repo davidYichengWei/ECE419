@@ -38,6 +38,8 @@ public class KVServer implements IKVServer, Runnable {
 	// Metadata of server keyrange, should be in the form <kr-from>, <kr-to>, <ip:port>; <kr-from>, <kr-to>, <ip:port>;...
 	private String metadata = "initial metadata";
 
+	private boolean shutdownFinished = false;
+
 	/**
 	 * Start KV Server at given port
 	 * @param serverAddress that the server binds to
@@ -69,6 +71,14 @@ public class KVServer implements IKVServer, Runnable {
 		}
 
 		new Thread(this).start(); // To prevent blocking in tests
+	}
+
+	public boolean getShutdownFinished() {
+		return shutdownFinished;
+	}
+
+	public void setShutdownFinished(boolean shutdownFinished) {
+		this.shutdownFinished = shutdownFinished;
 	}
 	
 	@Override
@@ -250,6 +260,19 @@ public class KVServer implements IKVServer, Runnable {
 		return true;
 	}
 
+	public void deleteZnode() {
+		try {
+			zk.delete("/servers/" + serverAddress + ":" + port, zk.exists("/servers/" + serverAddress + ":" + port, false).getVersion());
+			logger.info("Deleted znode for server: " + "/servers/" + serverAddress + ":" + port);
+		}
+		catch (KeeperException ex) {
+			logger.error("Failed to delete znode for server");
+		}
+		catch (InterruptedException ex) {
+			logger.error("Failed to delete znode for server");
+		}
+	}
+
 	private boolean isRunning() {
 		return this.running;
 	}
@@ -262,6 +285,20 @@ public class KVServer implements IKVServer, Runnable {
 	@Override
     public void close(){
 		// TODO Auto-generated method stub
+	}
+
+	// Shutdown hook triggered when KVServer is stopped with ctrl+c
+	// Delete znode for the KVServer and wait to process ECSMessage
+	public void shutDown() {
+		deleteZnode();
+
+		System.out.println("Shutting down KVServer ...");
+		while(getShutdownFinished() == false) {
+			// Wait for ECSMessage
+			// Need to set shutdownFinished to true at the end of data transfer
+		}
+
+		System.out.println("KVServer shut down.");
 	}
 
 	/**
@@ -320,7 +357,15 @@ public class KVServer implements IKVServer, Runnable {
 					System.exit(1);
 				}
 				
-				new KVServer(address, port, 100, "FIFO", fileDirectory);
+				final KVServer server = new KVServer(address, port, 100, "FIFO", fileDirectory);
+
+				// Add a shutdown hook to process graceful shutdown
+				Runtime.getRuntime().addShutdownHook(new Thread() {
+					@Override
+					public void run() {
+						server.shutDown();
+					}
+				});
 			}
 		} catch (NumberFormatException nfe) {
 			System.out.println("Error! Invalid argument! Either <port> or <cacheSize> is not a number!");
