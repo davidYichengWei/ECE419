@@ -120,32 +120,40 @@ public class ClientConnection implements Runnable {
         System.out.println("ECSMessage received: " + msg.getStatus() + " " 
             + msg.getMetadata() + " " + msg.getServerToContact());
         
-        // Reply to ECS server with TRANSFER_ACK
-        ECSMessage ecsReply = new ECSMessage(ECSMessage.ECSMessageStatus.TRANSFER_ACK, null, null);
+        // Reply to ECS server with ACK
+        ECSMessage ecsReply = new ECSMessage(ECSMessage.ECSMessageStatus.ACK, null, null);
         sendECSMessage(ecsReply);
-        synchronized (this) {
-            if (msg.getStatus() == ECSMessage.ECSMessageStatus.TRANSFER_BEGIN) {
-                try {
-                    String[] meta_list = meta.split(";");
-                    String range = "";
-                    for(int i=0;i<meta_list.length;i++){
-                        String[] meta_port = meta_list[i].split(":");
 
-                        if(meta_port[1].equals(""+ this.server.getPort())){
-                            range = meta_port[0];
-                            break;
-                        }
+        // Process ECSMessage based on status
+        if (msg.getStatus() == ECSMessage.ECSMessageStatus.TRANSFER) { 
+            // try {
+                String[] meta_list = meta.split(";");
+                String range = "";
+                for(int i=0;i<meta_list.length;i++){
+                    String[] meta_port = meta_list[i].split(":");
+
+                    if(meta_port[1].equals(""+ this.server.getPort())){
+                        range = meta_port[0];
+                        break;
                     }
-                    String[] key_range = range.split(",");
-                    this.server.moveKV(key_range, serverToCon); 
                 }
-                catch (IOException ioe) {
-                    logger.error("Error! Unable to send KV pairs to another server!", ioe);
-                }
-            }
+                String[] key_range = range.split(",");
+                this.server.moveKV(key_range, serverToCon); 
+            // }
+            // catch (IOException ioe) {
+            //     logger.error("Error! Unable to send KV pairs to another server!", ioe);
+            // }
         }
-        // Begin transfer of data
-        // TODO
+        else if (msg.getStatus() == ECSMessage.ECSMessageStatus.RECEIVE) {
+            // Update local metadata
+            // Wait for data transfer from serverToContact
+        }
+        else if (msg.getStatus() == ECSMessage.ECSMessageStatus.NO_TRANSFER) {
+
+            // If first server added, updated metadata, set state to RUNNING
+
+            // If last server removed, keep shutting down
+        }
 
     }
 

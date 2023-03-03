@@ -165,12 +165,23 @@ public class ECSClient implements IECSClient {
     public void processServerListChange(List<String> oldList, List<String> newList) {
         System.out.println("Process server list change");
 
+        boolean addingServer = false;
+        if (newList.size() > oldList.size()) {
+            addingServer = true;
+        }
+
         List<String> targetServers = findTargetServers(oldList, newList);
-        System.out.println("Server added/removed: " + targetServers.get(0));
+
+        if (addingServer) {
+            System.out.println("Adding server: " + targetServers.get(0));
+        }
+        else {
+            System.out.println("Removing server: " + targetServers.get(0));
+        }
         if (targetServers.size() == 2) {
             System.out.println("Its successor: " + targetServers.get(1));
         }
-
+        
         // Send metadata to target servers in the list
         String listOfHostPorts = String.join(" ", newList);
         String metadata = MD5Hasher.buildKeyRangeMessage(listOfHostPorts);
@@ -184,15 +195,36 @@ public class ECSClient implements IECSClient {
 
             // Build ECSMessage
             String serverToContact = null;
-            if (targetServers.size() > 1) {
+            if (targetServers.size() == 2) {
                 if (i == 0) {
                     serverToContact = targetServers.get(1);
                 } else {
                     serverToContact = targetServers.get(0);
                 }
             }
-            ECSMessage message = new ECSMessage(ECSMessage.ECSMessageStatus.TRANSFER_BEGIN, metadata, serverToContact);
 
+            ECSMessage.ECSMessageStatus status = ECSMessage.ECSMessageStatus.NO_TRANSFER;
+
+            if (targetServers.size() == 2) {
+                if (i == 0) {
+                    if (addingServer) { // New node should receive data
+                        status = ECSMessage.ECSMessageStatus.RECEIVE;
+                    }
+                    else { // Node to be deleted should transfer data
+                        status = ECSMessage.ECSMessageStatus.TRANSFER;
+                    }
+                }
+                else { 
+                    if (addingServer) { // New nodes' successor should transfer data
+                        status = ECSMessage.ECSMessageStatus.TRANSFER;
+                    }
+                    else { // Node to be deleted's successor should receive data
+                        status = ECSMessage.ECSMessageStatus.RECEIVE;
+                    }
+                }
+            }
+
+            ECSMessage message = new ECSMessage(status, metadata, serverToContact);
             ECSKVServerConnection connection = new ECSKVServerConnection(host, port, message);
             logger.info("Start a thread to send metadata to " + host + ":" + port);
             new Thread(connection).start();

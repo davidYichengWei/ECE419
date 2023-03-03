@@ -5,9 +5,10 @@ import java.io.Serializable;
 // Communication protocol between ECS and KVServer
 public class ECSMessage implements Serializable {
     public enum ECSMessageStatus {
-		TRANSFER_BEGIN, 	/* From ECS -> KVServer */
-		TRANSFER_ACK 		/* From KVServer -> ECS to acknowledge */
-        
+		TRANSFER, 	/* KVServer transfer data to serverToContact */
+        RECEIVE, 	/* KVServer receive data from serverToContact */
+        NO_TRANSFER, 	/* KVServer is the first server added or last server deleted, no data transfer required */
+		ACK 		/* From KVServer -> ECS to acknowledge */
 	}
 
     private String metadata; // Updated metadata, null if status is TRANSFER_ACK
