@@ -16,6 +16,7 @@ import app_kvServer.storage.FileStorage;
 import org.slf4j.LoggerFactory; // Required for ZooKeeper
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
+import shared.messages.Metadata;
 
 public class KVServer implements IKVServer, Runnable {
 
@@ -38,7 +39,27 @@ public class KVServer implements IKVServer, Runnable {
 	// Metadata of server keyrange, should be in the form <kr-from>, <kr-to>, <ip:port>; <kr-from>, <kr-to>, <ip:port>;...
 	private String metadata = "initial metadata";
 	private boolean shutdownFinished = false; // For the shutdown hook
+	private Metadata metadataObj;
 	private ClientConnection serverConnection;
+	private ServerStatus status;
+
+	public void setMetadata(String metadata) {
+		this.metadata = metadata;
+		this.metadataObj = new Metadata(metadata);
+	}
+
+	public Metadata getMetadataObj() {
+		return metadataObj;
+	}
+
+	public void setStatus(ServerStatus status) {
+		this.status = status;
+	}
+
+	public ServerStatus getStatus() {
+		return status;
+	}
+
 	/**
 	 * Start KV Server at given port
 	 * @param serverAddress that the server binds to
@@ -103,7 +124,7 @@ public class KVServer implements IKVServer, Runnable {
 		// TODO Auto-generated method stub
 		// InetAddress ia = InetAddress.getLocalHost();
 		// String host = ia.getHostName();
-		return "127.0.0.1";
+		return serverAddress;
 	}
 
 	@Override
@@ -212,6 +233,7 @@ public class KVServer implements IKVServer, Runnable {
 						String newData = new String(zk.getData(metadataPath, true, null));
 						if (event.getType() == Event.EventType.NodeDataChanged && !newData.equals(metadata)) {
 							metadata = newData;
+							metadataObj = new Metadata(metadata);
 							logger.info("Metadata value changed to: " + metadata);
 						}
 					} catch (KeeperException e) {
@@ -285,7 +307,7 @@ public class KVServer implements IKVServer, Runnable {
 		// 	logger.error("Failed to update metadata");
 		// 	return false;
 		// }
-
+		this.setStatus(ServerStatus.SERVER_STOPPED);
 		return true;
 	}
 

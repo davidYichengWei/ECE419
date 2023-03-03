@@ -3,10 +3,12 @@ package app_kvServer;
 import java.io.*;
 import java.net.Socket;
 
+import ecs.ECSNode;
 import org.apache.log4j.*;
 import shared.messages.KVMessage;
 import shared.messages.Message;
 import shared.messages.ECSMessage;
+import shared.module.MD5Hasher;
 
 
 /**
@@ -111,11 +113,14 @@ public class ClientConnection implements Runnable {
     // Handle server data transfer message
     public void handleServerMessage() { // Takes ServerMessage as input
         // TODO
+        // Set server state
     }
 
     // Handle ECS message, start data transfer if needed
     public void handleECSMessage(ECSMessage msg) {
-        String meta = msg.getMetadata();
+        String keyRangeMessage = msg.getMetadata();
+        String listHostPorts = MD5Hasher.buildListOfPorts(keyRangeMessage);
+        this.server.setMetadata(listHostPorts);
         String serverToCon = msg.getServerToContact();
         System.out.println("ECSMessage received: " + msg.getStatus() + " " 
             + msg.getMetadata() + " " + msg.getServerToContact());
@@ -127,18 +132,11 @@ public class ClientConnection implements Runnable {
         // Process ECSMessage based on status
         if (msg.getStatus() == ECSMessage.ECSMessageStatus.TRANSFER) { 
             // try {
-                String[] meta_list = meta.split(";");
-                String range = "";
-                for(int i=0;i<meta_list.length;i++){
-                    String[] meta_port = meta_list[i].split(":");
-
-                    if(meta_port[1].equals(""+ this.server.getPort())){
-                        range = meta_port[0];
-                        break;
-                    }
-                }
-                String[] key_range = range.split(",");
-                this.server.moveKV(key_range, serverToCon); 
+            String hostPort = this.server.getHostname() + ":" + String.valueOf(this.server.getPort());
+            String serverPositionKey = MD5Hasher.hash(hostPort);
+            ECSNode serverNode = this.server.getMetadataObj().findNode(serverPositionKey);
+            String[] key_range = serverNode.getNodeHashRange();
+            this.server.moveKV(key_range, serverToCon);
             // }
             // catch (IOException ioe) {
             //     logger.error("Error! Unable to send KV pairs to another server!", ioe);
