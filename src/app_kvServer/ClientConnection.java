@@ -126,7 +126,18 @@ public class ClientConnection implements Runnable {
         synchronized (this) {
             if (msg.getStatus() == ECSMessage.ECSMessageStatus.TRANSFER_BEGIN) {
                 try {
-                    Map<String, String> moved = this.server.moved_batch(meta);
+                    String[] meta_list = meta.split(";");
+                    String range = "";
+                    for(int i=0;i<meta_list.length;i++){
+                        String[] meta_port = meta_list[i].split(":");
+
+                        if(meta_port[1].equals(""+ this.server.getPort())){
+                            range = meta_port[0];
+                            break;
+                        }
+                    }
+                    String[] key_range = range.split(",");
+                    this.server.moveKV(key_range, serverToCon); 
                 }
                 catch (IOException ioe) {
                     logger.error("Error! Unable to send KV pairs to another server!", ioe);
