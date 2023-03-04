@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.util.Map;
 import ecs.ECSNode;
 import org.apache.log4j.*;
+
+import app_kvServer.IKVServer.ServerStatus;
 import shared.messages.KVMessage;
 import shared.messages.Message;
 import shared.messages.ECSMessage;
@@ -122,6 +124,17 @@ public class ClientConnection implements Runnable {
             this.server.receiveKV(pairs);
             ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV_ACK, "");
             sendServerMessage(reply);
+            
+        }
+        else if (status == ServerMessage.ServerMessageStatus.SEND_KV_ACK){
+            ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.SET_RUNNING, "");
+            sendServerMessage(reply);
+        }
+        else if (status == ServerMessage.ServerMessageStatus.SET_RUNNING){
+            this.server.setStatus(ServerStatus.RUNNING);
+            ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.SET_RUNNING_ACK, "");
+            sendServerMessage(reply);
+            this.isOpen=false;
         }
 
 
@@ -147,6 +160,12 @@ public class ClientConnection implements Runnable {
             // catch (IOException ioe) {
             //     logger.error("Error! Unable to send KV pairs to another server!", ioe);
             // }
+            String hostPort = this.server.getHostname();
+            String ServerPositionKey = MD5Hasher.hash(hostPort);
+            ECSNode serverNode = this.server.getMetadataObj().findNode(ServerPositionKey);
+            String[] key_range = serverNode.getNodeHashRange();
+            this.server.transferKV(key_range, serverToCon);
+
         }
         else if (msg.getStatus() == ECSMessage.ECSMessageStatus.RECEIVE) {
             // Update local metadata

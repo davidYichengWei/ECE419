@@ -3,7 +3,7 @@ package app_kvServer;
 import logger.LogSetup;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
+import java.io.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.net.InetAddress;
 import app_kvServer.storage.FileStorage;
-
 import org.slf4j.LoggerFactory; // Required for ZooKeeper
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
@@ -182,10 +181,20 @@ public class KVServer implements IKVServer, Runnable {
 		Map<String, String> move_map = fs.move_batch(hashRange);
 		String kvPairs = move_map.toString();
 		String[] dest = server.split(":");
-		Socket socket = new Socket(dest[0], Integer.parseInt(dest[1]));
-		this.serverConnection = new ClientConnection(socket, this);
-		ServerMessage msg = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV, kvPairs);
-		this.serverConnection.sendServerMessage(msg);
+		
+		try {
+			Socket socket = new Socket(dest[0], Integer.parseInt(dest[1]));
+			OutputStream output = socket.getOutputStream();
+			InputStream input = socket.getInputStream();
+			ServerMessage msg = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV, kvPairs);
+            byte[] msgBytes = msg.toByteArray();
+            output.write(msgBytes, 0, msgBytes.length);
+            output.flush();
+        } catch (IOException e) {
+            logger.error("Error sending Server message: " + e.getMessage(), e);
+        }
+		
+		
 		
 	}
 	public void receiveKV(Map<String, String> batch){
