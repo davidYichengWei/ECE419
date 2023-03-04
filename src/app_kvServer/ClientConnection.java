@@ -2,7 +2,7 @@ package app_kvServer;
 
 import java.io.*;
 import java.net.Socket;
-
+import java.util.Map;
 import ecs.ECSNode;
 import org.apache.log4j.*;
 import shared.messages.KVMessage;
@@ -10,6 +10,7 @@ import shared.messages.Message;
 import shared.messages.ECSMessage;
 import shared.module.MD5Hasher;
 import shared.messages.ServerMessage;
+import shared.messages.ServerMessage.ServerMessageStatus;
 
 /**
  * Represents a connection end point for a particular client that is
@@ -74,7 +75,7 @@ public class ClientConnection implements Runnable {
                     } 
                     else if (msgType == MessageType.Server_Message) {
                         logger.info("Message type: Server_Message");
-                        handleServerMessage();
+                        handleServerMessage(new ServerMessage(msgBytes));
                     } 
                     else {
                         logger.error("Unknown message type received");
@@ -111,11 +112,21 @@ public class ClientConnection implements Runnable {
     }
 
     // Handle server data transfer message
-    public void handleServerMessage() { // Takes ServerMessage as input
+    public void handleServerMessage(ServerMessage msg) { // Takes ServerMessage as input
         // TODO
         // Set server state
-    }
+        ServerMessageStatus status = msg.getServerStatus();
+        System.out.println("ServerMessage received: Transmitting KV pairs.");
+        if(status == ServerMessage.ServerMessageStatus.SEND_KV){
+            Map<String, String> pairs = msg.getPairs();
+            this.server.receiveKV(pairs);
+            ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV_ACK, "");
+            sendServerMessage(reply);
+        }
 
+
+    }
+    
     // Handle ECS message, start data transfer if needed
     public void handleECSMessage(ECSMessage msg) {
         String keyRangeMessage = msg.getMetadata();
@@ -132,11 +143,6 @@ public class ClientConnection implements Runnable {
         // Process ECSMessage based on status
         if (msg.getStatus() == ECSMessage.ECSMessageStatus.TRANSFER) { 
             // try {
-            String hostPort = this.server.getHostname() + ":" + String.valueOf(this.server.getPort());
-            String serverPositionKey = MD5Hasher.hash(hostPort);
-            ECSNode serverNode = this.server.getMetadataObj().findNode(serverPositionKey);
-            String[] key_range = serverNode.getNodeHashRange();
-            this.server.moveKV(key_range, serverToCon);
             // }
             // catch (IOException ioe) {
             //     logger.error("Error! Unable to send KV pairs to another server!", ioe);
@@ -305,8 +311,15 @@ public class ClientConnection implements Runnable {
         }
     }
     public void sendServerMessage(ServerMessage msg){
-
+        try {
+            byte[] msgBytes = msg.toByteArray();
+            output.write(msgBytes, 0, msgBytes.length);
+            output.flush();
+        } catch (IOException e) {
+            logger.error("Error sending Server message: " + e.getMessage(), e);
+        }
     }
+    
 
     public void sendECSMessage(ECSMessage msg) {
         try {

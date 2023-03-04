@@ -1,11 +1,11 @@
 package shared.messages;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 public class ServerMessage implements Serializable {
     public enum ServerMessageStatus {
 		SEND_KV, 	/* KVServer transfer data to serverToContact */
-        RECEIVE, 	/* KVServer receive data from serverToContact */
-        NO_TRANSFER, 	/* KVServer is the first server added or last server deleted, no data transfer required */
-		SEND_KV_ACK 		/* From KVServer -> ECS to acknowledge */
+		SEND_KV_ACK 		/* reply after receiving data */
 	}
     private String KVPairs;
     private ServerMessageStatus status;
@@ -16,16 +16,19 @@ public class ServerMessage implements Serializable {
         this.status = status;
         this.KVPairs = value;
     }
-    public ECSMessage(byte[] encodedStringBytes) throws IllegalArgumentException {
-        byte[] bytes = addCtrChars(encodedStringBytes);
-        String encodedString = new String(bytes).trim();
-        String[] parts = encodedString.split(DELIMITER);
-        this.status = ECSMessageStatus.valueOf(parts[0].toUpperCase());
-        if (parts.length > 1) {
-            this.metadata = parts[1];
-            if (parts.length > 2) {
-                this.serverToContact = parts[2];
-            }
-        }
+
+    public ServerMessageStatus getServerStatus(){
+        return this.status;
     }
+    public Map<String, String> getPairs(){
+        Map<String, String> temp = new HashMap<String, String>();
+        String[] strings = this.KVPairs.split(",");
+        for (String str : strings) {
+            String[] s = str.split("=");
+            temp.put(s[0],s[1]);
+        }
+        return temp;
+        
+    }
+    
 }

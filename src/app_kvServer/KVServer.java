@@ -178,7 +178,7 @@ public class KVServer implements IKVServer, Runnable {
 		fs.clearStorage();
 		// TODO Auto-generated method stub
 	}
-	public void moveKV(String[] hashRange, String server){
+	public void transferKV(String[] hashRange, String server){
 		Map<String, String> move_map = fs.move_batch(hashRange);
 		String kvPairs = move_map.toString();
 		String[] dest = server.split(":");
@@ -186,14 +186,11 @@ public class KVServer implements IKVServer, Runnable {
 		this.serverConnection = new ClientConnection(socket, this);
 		ServerMessage msg = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV, kvPairs);
 		this.serverConnection.sendServerMessage(msg);
-		ServerMessage receive = this.serverConnection.recceiveServerMessage();
-		if(receive.getServerStatus() == ServerMessage.ServerMessageStatus.SEND_KV_ACK){
-			fs.move_kv_done(move_map);
-		}
-		socket.close();
 		
 	}
-
+	public void receiveKV(Map<String, String> batch){
+		fs.receive_pairs(batch);
+	}
 	// Shutdown hook triggered when KVServer is stopped with ctrl+c
 	// Delete znode for the KVServer and wait to process ECSMessage
 	public void shutDown() {

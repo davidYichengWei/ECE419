@@ -128,6 +128,12 @@ public class FileStorage implements IFileStorage{
         storeKVInFile();
 
     }
+    public void receive_pairs(Map<String, String> batch){
+        for(String i:batch.keySet()){
+            hash_table.put(i, batch.get(i));
+        }
+        storeKVInFile();
+    }
     @Override
     public String getKV(String key)
     {
