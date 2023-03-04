@@ -121,6 +121,13 @@ public class FileStorage implements IFileStorage{
         }
         return movedKV;
     }
+    public void move_kv_done(Map<String, String> batch){
+        for(String i:batch.keySet()){
+            hash_table.remove(i);
+        }
+        storeKVInFile();
+
+    }
     @Override
     public String getKV(String key)
     {

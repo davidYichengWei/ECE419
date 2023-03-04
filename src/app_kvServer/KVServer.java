@@ -10,6 +10,8 @@ import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 import java.net.InetAddress;
 import app_kvServer.storage.FileStorage;
 
@@ -17,6 +19,7 @@ import org.slf4j.LoggerFactory; // Required for ZooKeeper
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import shared.messages.Metadata;
+import shared.messages.ServerMessage;
 
 public class KVServer implements IKVServer, Runnable {
 
@@ -176,6 +179,18 @@ public class KVServer implements IKVServer, Runnable {
 		// TODO Auto-generated method stub
 	}
 	public void moveKV(String[] hashRange, String server){
+		Map<String, String> move_map = fs.move_batch(hashRange);
+		String kvPairs = move_map.toString();
+		String[] dest = server.split(":");
+		Socket socket = new Socket(dest[0], Integer.parseInt(dest[1]));
+		this.serverConnection = new ClientConnection(socket, this);
+		ServerMessage msg = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV, kvPairs);
+		this.serverConnection.sendServerMessage(msg);
+		ServerMessage receive = this.serverConnection.recceiveServerMessage();
+		if(receive.getServerStatus() == ServerMessage.ServerMessageStatus.SEND_KV_ACK){
+			fs.move_kv_done(move_map);
+		}
+		socket.close();
 		
 	}
 

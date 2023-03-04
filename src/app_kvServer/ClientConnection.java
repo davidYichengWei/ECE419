@@ -9,7 +9,7 @@ import shared.messages.KVMessage;
 import shared.messages.Message;
 import shared.messages.ECSMessage;
 import shared.module.MD5Hasher;
-
+import shared.messages.ServerMessage;
 
 /**
  * Represents a connection end point for a particular client that is
@@ -303,6 +303,9 @@ public class ClientConnection implements Runnable {
         } catch (IOException e) {
             logger.error("Error sending message: " + e.getMessage(), e);
         }
+    }
+    public void sendServerMessage(ServerMessage msg){
+
     }
 
     public void sendECSMessage(ECSMessage msg) {
