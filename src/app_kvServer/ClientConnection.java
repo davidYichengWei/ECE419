@@ -165,9 +165,40 @@ public class ClientConnection implements Runnable {
                 + msg.getValue() + ">}");
         
         // Synchronize I/O to prevent concurrent access to K/V pairs
-        synchronized (this) {
+        synchronized (server) {
             // Logic to process message and to send back a response
-            if (msg.getStatus() == KVMessage.StatusType.GET) {
+            if (server.getStatus() == IKVServer.ServerStatus.SERVER_STOPPED) {
+                KVMessage.StatusType status = KVMessage.StatusType.SERVER_STOPPED;
+                sendClientMessage(new Message(
+                        null, null,
+                        status));
+            }
+            else if (msg.getStatus() == KVMessage.StatusType.KEYRANGE) {
+                try {
+                    String hostPorts = server.getMetadataObj().buildListOfHostPorts();
+                    String value = MD5Hasher.buildKeyRangeMessage(hostPorts);
+                    KVMessage.StatusType status = KVMessage.StatusType.KEYRANGE_SUCESS;
+                    sendClientMessage(new Message(
+                            null, value,
+                            status));
+                }
+                catch (Exception ex) {
+                    logger.error("KEYRANGE ERROR", ex);
+                    sendClientMessage(new Message(
+                            null, null,
+                            KVMessage.StatusType.GET_ERROR));
+                }
+                return;
+            }
+            String keyHash = MD5Hasher.hash(msg.getKey());
+            ECSNode current = server.getMetadataObj().findNode(keyHash);
+            if (server.getHostname() != current.getNodeHost() || server.getPort() != current.getNodePort()) {
+                KVMessage.StatusType status = KVMessage.StatusType.SERVER_NOT_RESPONSIBLE;
+                sendClientMessage(new Message(
+                        null, null,
+                        status));
+            }
+            else if (msg.getStatus() == KVMessage.StatusType.GET) {
                 try {
                     String value = server.getKV(msg.getKey());
                     KVMessage.StatusType status = KVMessage.StatusType.GET_SUCCESS;
@@ -187,6 +218,14 @@ public class ClientConnection implements Runnable {
                 }
             }
             else if (msg.getStatus() == KVMessage.StatusType.PUT) {
+                // Check for write lock
+                if (server.getStatus() == IKVServer.ServerStatus.SERVER_WRITE_LOCK) {
+                    KVMessage.StatusType status = KVMessage.StatusType.SERVER_WRITE_LOCK;
+                    sendClientMessage(new Message(
+                            null, null,
+                            status));
+                    return;
+                }
                 // Check if PUT, PUT_UPDATE or DELETE
                 boolean delete = false;
                 boolean update = false;
