@@ -20,6 +20,7 @@ import org.apache.zookeeper.data.Stat;
 import shared.messages.Metadata;
 import shared.messages.ServerMessage;
 import shared.messages.ServerMessage.ServerMessageStatus;
+import shared.module.MD5Hasher;
 
 public class KVServer implements IKVServer, Runnable {
 
@@ -358,7 +359,7 @@ public class KVServer implements IKVServer, Runnable {
 						String newData = new String(zk.getData(metadataPath, true, null));
 						if (event.getType() == Event.EventType.NodeDataChanged && !newData.equals(metadata)) {
 							metadata = newData;
-							metadataObj = new Metadata(metadata);
+							metadataObj = new Metadata(MD5Hasher.buildListOfPorts(metadata));
 							logger.info("Metadata value changed to: " + metadata);
 						}
 					} catch (KeeperException e) {
