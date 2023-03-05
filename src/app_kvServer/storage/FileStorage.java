@@ -110,6 +110,9 @@ public class FileStorage implements IFileStorage{
 
         storeKVInFile();
     }
+    public Map<String, String> get_all_pairs(){
+        return hash_table;
+    }
     public Map<String, String> move_batch(String[] hash_range){
         String begin = hash_range[0];
         String end = hash_range[1];
@@ -161,7 +164,7 @@ public class FileStorage implements IFileStorage{
     public void receive_pairs(Map<String, String> batch){
         for(String i:batch.keySet()){
             hash_table.put(i, batch.get(i));
-            System.out.println(i+"    RRRRRRRRRRRRRRRRRRRRRRRRR receiving pairs      "+hash_table.get(i));
+            // System.out.println(i+"    RRRRRRRRRRRRRRRRRRRRRRRRR receiving pairs      "+hash_table.get(i));
         }
         storeKVInFile();
     }

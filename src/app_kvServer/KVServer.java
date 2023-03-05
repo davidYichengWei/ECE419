@@ -269,6 +269,33 @@ public class KVServer implements IKVServer, Runnable {
 		}
 		return temp;
 	}
+	public void dumpKV(String server){
+
+		String kvPairs = convert_map_string(fs.get_all_pairs());
+		
+		String[] dest = server.split(":");
+		try {
+			Socket socket = new Socket(dest[0], Integer.parseInt(dest[1]));
+			System.out.println(dest[0]);
+			System.out.println(dest[1]);
+
+			OutputStream output = socket.getOutputStream();
+			InputStream input = socket.getInputStream();
+			System.out.println("TRANSFERING KV PAIRS" +kvPairs);
+			ServerMessage msg = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV, kvPairs);
+            byte[] msgBytes = msg.toByteArray();
+            output.write(msgBytes, 0, msgBytes.length);
+            output.flush();
+			
+			ServerMessage reply = receiveMessage(input);
+			if(reply.getServerStatus() == ServerMessageStatus.SEND_KV_ACK){
+				fs.clearStorage();
+			}
+		} catch (IOException e) {
+            logger.error("Error dumping Server message: " + e.getMessage(), e);
+        }
+
+	}
 	public void transferKV(String[] hashRange, String server){
 		Map<String, String> move_map = fs.move_batch(hashRange);
 		// move_map.put("------------", "++++++++++++++++++");

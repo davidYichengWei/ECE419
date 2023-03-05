@@ -168,7 +168,13 @@ public class ClientConnection implements Runnable {
             ECSNode serverNode = this.server.getMetadataObj().findNode(ServerPositionKey);
             String[] key_range = serverNode.getNodeHashRange();
             // System.out.println("TRANSFER STATUS--------running transfer KV");
-            this.server.transferKV(key_range, serverToCon);
+            if(this.server.getShuttingDown()){
+                this.server.dumpKV(serverToCon);
+            }
+            else{
+                this.server.transferKV(key_range, serverToCon);
+            }
+            
             this.server.updateZnodeMetadata(msg.getMetadata());
         }
         else if (msg.getStatus() == ECSMessage.ECSMessageStatus.RECEIVE) {
@@ -204,7 +210,7 @@ public class ClientConnection implements Runnable {
         synchronized (server) {
             // Logic to process message and to send back a response
             if (server.getStatus() == IKVServer.ServerStatus.SERVER_STOPPED) {
-                System.out.println("____________________"+server.getStatus());
+                // System.out.println("____________________"+server.getStatus());
                 KVMessage.StatusType status = KVMessage.StatusType.SERVER_STOPPED;
                 sendClientMessage(new Message(
                         null, null,
