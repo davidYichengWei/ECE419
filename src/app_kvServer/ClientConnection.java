@@ -126,10 +126,7 @@ public class ClientConnection implements Runnable {
             sendServerMessage(reply);
             
         }
-        else if (status == ServerMessage.ServerMessageStatus.SEND_KV_ACK){
-            ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.SET_RUNNING, "");
-            sendServerMessage(reply);
-        }
+        
         else if (status == ServerMessage.ServerMessageStatus.SET_RUNNING){
             this.server.setStatus(ServerStatus.RUNNING);
             ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.SET_RUNNING_ACK, "");
@@ -170,11 +167,12 @@ public class ClientConnection implements Runnable {
         else if (msg.getStatus() == ECSMessage.ECSMessageStatus.RECEIVE) {
             // Update local metadata
             // Wait for data transfer from serverToContact
+
         }
         else if (msg.getStatus() == ECSMessage.ECSMessageStatus.NO_TRANSFER) {
 
             // If first server added, updated metadata, set state to RUNNING
-
+            
             // If last server removed, keep shutting down
         }
 

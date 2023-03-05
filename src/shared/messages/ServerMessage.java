@@ -33,7 +33,8 @@ public class ServerMessage implements Serializable {
         String[] strings = this.KVPairs.split(",");
         for (String str : strings) {
             String[] s = str.split("=");
-            temp.put(s[0],s[1]);
+            if(s.length==2)
+                temp.put(s[0],s[1]);
         }
         return temp;
         

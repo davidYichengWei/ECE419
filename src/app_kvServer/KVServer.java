@@ -19,6 +19,7 @@ import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import shared.messages.Metadata;
 import shared.messages.ServerMessage;
+import shared.messages.ServerMessage.ServerMessageStatus;
 
 public class KVServer implements IKVServer, Runnable {
 
@@ -177,6 +178,64 @@ public class KVServer implements IKVServer, Runnable {
 		fs.clearStorage();
 		// TODO Auto-generated method stub
 	}
+	public ServerMessage reveivMessage(InputStream input){
+		int index = 0;
+        byte[] msgBytes = null, tmp = null;
+        byte[] bufferBytes = new byte[1024];
+
+        /* read first char from stream */
+        byte read = (byte) input.read();
+        boolean reading = true;
+
+        while(read != 13 && reading) {/* carriage return */
+            /* if buffer filled, copy to msg array */
+            if(index == 1024) {
+                if(msgBytes == null){
+                    tmp = new byte[1024];
+                    System.arraycopy(bufferBytes, 0, tmp, 0, 1024);
+                } else {
+                    tmp = new byte[msgBytes.length + 1024];
+                    System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
+                    System.arraycopy(bufferBytes, 0, tmp, msgBytes.length,
+					1024);
+                }
+
+                msgBytes = tmp;
+                bufferBytes = new byte[1024];
+                index = 0;
+            }
+
+            /* only read valid characters, i.e. letters and numbers */
+            if((read >= 31 && read < 127)) {
+                bufferBytes[index] = read;
+                index++;
+            }
+
+            /* stop reading is DROP_SIZE is reached */
+            if(msgBytes != null && msgBytes.length + index >= 128 * 1024) {
+                reading = false;
+            }
+
+            /* read next char from stream */
+            read = (byte) input.read();
+        }
+
+        if(msgBytes == null){
+            tmp = new byte[index];
+            System.arraycopy(bufferBytes, 0, tmp, 0, index);
+        } else {
+            tmp = new byte[msgBytes.length + index];
+            System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
+            System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, index);
+        }
+
+        msgBytes = tmp;
+
+
+        /* build final String */
+        ServerMessage msg = new ServerMessage(msgBytes);
+		return msg;
+	}
 	public void transferKV(String[] hashRange, String server){
 		Map<String, String> move_map = fs.move_batch(hashRange);
 		String kvPairs = move_map.toString();
@@ -184,12 +243,21 @@ public class KVServer implements IKVServer, Runnable {
 		
 		try {
 			Socket socket = new Socket(dest[0], Integer.parseInt(dest[1]));
+			System.out.println(dest[0]);
+			System.out.println(dest[1]);
+
 			OutputStream output = socket.getOutputStream();
 			InputStream input = socket.getInputStream();
 			ServerMessage msg = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV, kvPairs);
             byte[] msgBytes = msg.toByteArray();
             output.write(msgBytes, 0, msgBytes.length);
             output.flush();
+			ServerMessage reply = reveivMessage(input);
+			if(reply.getServerStatus() == ServerMessageStatus.SEND_KV_ACK){
+				fs.move_kv_done(move_map);
+				ServerMessage runMsg = new ServerMessage(ServerMessage.ServerMessageStatus.SET_RUNNING, "");
+			}
+			
         } catch (IOException e) {
             logger.error("Error sending Server message: " + e.getMessage(), e);
         }
