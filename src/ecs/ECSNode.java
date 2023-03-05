@@ -4,7 +4,7 @@ import shared.module.MD5Hasher;
 
 public class ECSNode implements IECSNode {
     private String keyRangeFrom; //NOT INCLUSIVE
-    private final String keyRangeTo;
+    private String keyRangeTo;
     private String name;
     private String host;
     private int port;
@@ -20,6 +20,10 @@ public class ECSNode implements IECSNode {
 
     public void setKeyRangeFrom(String keyRangeFrom) {
         this.keyRangeFrom = keyRangeFrom;
+    }
+
+    public void setKeyRangeTo(String keyRangeTo) {
+        this.keyRangeTo = keyRangeTo;
     }
 
     @Override

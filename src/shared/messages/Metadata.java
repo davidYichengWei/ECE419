@@ -2,6 +2,7 @@ package shared.messages;
 
 import ecs.ECSNode;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.TreeSet;
 
@@ -73,14 +74,16 @@ public class Metadata implements IMetadata{
 
     @Override
     public ECSNode findNode(String key) {
+        System.out.println("Finding node for key: " + key);
         ECSNode dummyNode = new ECSNode(null, null, -1, key);
+        dummyNode.setKeyRangeTo(key);
         ECSNode node = tree.ceiling(dummyNode);
         if (node == null) {
             node = tree.first();
         }
+        System.out.println("Found node: " + node.getNodeHost() + ":" + node.getNodePort() + " with hash range " + Arrays.toString(node.getNodeHashRange()));
         return node;
     }
-
     public TreeSet<ECSNode> getTree() {
         return tree;
     }
