@@ -44,13 +44,23 @@ public class KVClient implements IKVClient {
     }
 
     public void run() {
+        Thread shutdownHook = new Thread() {
+            @Override
+            public void run() {
+                shutDown();
+            }
+        };
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+
         while(!stop) {
             stdin = new BufferedReader(new InputStreamReader(System.in));
             System.out.print(PROMPT);
 
             try {
                 String cmdLine = stdin.readLine();
-                this.handleCommand(cmdLine);
+                if (cmdLine != null) {
+                    this.handleCommand(cmdLine);
+                }
             } catch (IOException e) {
                 stop = true;
                 printError("CLI does not respond - Application terminated ");
@@ -215,13 +225,6 @@ public class KVClient implements IKVClient {
         try {
             new LogSetup("logs/client.log", Level.ALL);
             KVClient app = new KVClient();
-
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    app.shutDown();
-                }
-            });
 
             app.run();
         } catch (IOException e) {

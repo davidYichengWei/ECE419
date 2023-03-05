@@ -49,6 +49,12 @@ public class MD5Hasher {
     }
 
     public static String buildListOfPorts(String keyRangeMessage) {
+        if (keyRangeMessage == null) {
+            return null;
+        }
+        if (keyRangeMessage.equals("null")) {
+            return null;
+        }
         if (keyRangeMessage.length() == 0) {
             return null;
         }

@@ -17,7 +17,12 @@ public class Metadata implements IMetadata{
                 return KeyRangeTo1.compareTo(KeyRangeTo2);
             }
         });
-        String[] hostPorts = listOfHostPorts.split(" ");
+        String[] hostPorts;
+        if (listOfHostPorts != null) {
+            hostPorts = listOfHostPorts.split(" ");
+        } else {
+            hostPorts = new String[0];
+        }
         // Insert all Servers into tree
         for (String hostPort : hostPorts) {
             String[] parts = hostPort.split(":");
