@@ -88,3 +88,13 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
 2023-03-04 23:53:04,364 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:49989
 2023-03-04 23:53:04,369 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /127.0.0.1:49989
 2023-03-04 23:53:04,396 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x100243bc8960008 with negotiated timeout 4000 for client /127.0.0.1:49989
+2023-03-05 00:08:02,705 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@376] - Unable to read additional data from client sessionid 0x100243bc8960006, likely client has closed socket
+2023-03-05 00:08:02,706 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1040] - Closed socket connection for client /127.0.0.1:49977 which had sessionid 0x100243bc8960006
+2023-03-05 00:08:08,070 [myid:] - INFO  [SessionTracker:ZooKeeperServer@354] - Expiring session 0x100243bc8960006, timeout of 5000ms exceeded
+2023-03-05 00:08:08,070 [myid:] - INFO  [ProcessThread(sid:0 cport:2181)::PrepRequestProcessor@487] - Processed session termination for sessionid: 0x100243bc8960006
+2023-03-05 00:09:07,873 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:50122
+2023-03-05 00:09:07,878 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /127.0.0.1:50122
+2023-03-05 00:09:07,902 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x100243bc8960009 with negotiated timeout 4000 for client /127.0.0.1:50122
+2023-03-05 00:09:14,745 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:50123
+2023-03-05 00:09:14,751 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@938] - Client attempting to establish new session at /127.0.0.1:50123
+2023-03-05 00:09:14,774 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@683] - Established session 0x100243bc896000a with negotiated timeout 4000 for client /127.0.0.1:50123

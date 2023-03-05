@@ -198,6 +198,7 @@ public class ClientConnection implements Runnable {
         synchronized (server) {
             // Logic to process message and to send back a response
             if (server.getStatus() == IKVServer.ServerStatus.SERVER_STOPPED) {
+                System.out.println("____________________"+server.getStatus());
                 KVMessage.StatusType status = KVMessage.StatusType.SERVER_STOPPED;
                 sendClientMessage(new Message(
                         null, null,

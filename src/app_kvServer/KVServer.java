@@ -270,7 +270,9 @@ public class KVServer implements IKVServer, Runnable {
 				if (shuttingDown == false) {
 					// SEND SET_RUNNING to serverToContact
 					ServerMessage runMsg = new ServerMessage(ServerMessage.ServerMessageStatus.SET_RUNNING, "");
-
+					byte[] runmsgBytes = runMsg.toByteArray();
+            		output.write(runmsgBytes, 0, runmsgBytes.length);
+            		output.flush();
 				}
 				else {
 					// Set shutdownFinished to true
