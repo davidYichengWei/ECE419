@@ -15,6 +15,9 @@ public class KVStore implements KVCommInterface {
 	private String serverAdress;
 	private int serverPort;
 	private Metadata metadata;
+
+	private boolean manuallyDisconnected = false; // To avoid automatically connecting when manually disconnected
+
 	/**
 	 * Initialize KVStore with address and port of KVServer
 	 * @param address the address of the KVServer
@@ -64,6 +67,8 @@ public class KVStore implements KVCommInterface {
 			// Handle the exception here
 			throw new UnknownHostException("Unknown host: " + e.getMessage());
 		}
+
+		manuallyDisconnected = false;
 	}
 
 	@Override
@@ -73,10 +78,17 @@ public class KVStore implements KVCommInterface {
 			this.clientCommunicationModule.closeConnection();
 			this.clientCommunicationModule = null;
 		}
+
+		manuallyDisconnected = true;
 	}
 
 	@Override
 	public KVMessage put(String key, String value) throws Exception {
+
+		if (manuallyDisconnected) {
+			throw new Exception("Client is manually disconnected");
+		}
+
 		// TODO Auto-generated method stub
 		boolean requestSuccessful = false;
 		String HashKey = MD5Hasher.hash(key);
@@ -121,6 +133,11 @@ public class KVStore implements KVCommInterface {
 
 	@Override
 	public KVMessage get(String key) throws Exception {
+		
+		if (manuallyDisconnected) {
+			throw new Exception("Client is manually disconnected");
+		}
+
 		// TODO Auto-generated method stub
 		boolean requestSuccessful = false;
 		String HashKey = MD5Hasher.hash(key);
