@@ -112,13 +112,27 @@ public class FileStorage implements IFileStorage{
     public Map<String, String> move_batch(String[] hash_range){
         String begin = hash_range[0];
         String end = hash_range[1];
+        String cycle_begin = "00000000000000000000000000000000";
+        String cycle_end = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+
         Map<String, String> movedKV = new HashMap<String, String>();
-        for(String i:hash_table.keySet()){
-            String HashKey = MD5Hasher.hash(i);
-            if (HashKey.compareTo(begin) >= 0 && HashKey.compareTo(end) <= 0) {
-                movedKV.put(i, hash_table.get(i));
+        if(end.compareToIgnoreCase(begin)>0){
+            for(String i:hash_table.keySet()){
+                String HashKey = MD5Hasher.hash(i);
+                if (HashKey.compareTo(begin) < 0 && HashKey.compareTo(end) > 0) {
+                    movedKV.put(i, hash_table.get(i));
+                }
             }
         }
+        else if(end.compareToIgnoreCase(begin)<0){
+            for(String i:hash_table.keySet()){
+                String HashKey = MD5Hasher.hash(i);
+                if (HashKey.compareTo(begin) > 0 && HashKey.compareTo(end) < 0) {
+                    movedKV.put(i, hash_table.get(i));
+                }
+            }
+        }
+        
         return movedKV;
     }
     public void move_kv_done(Map<String, String> batch){

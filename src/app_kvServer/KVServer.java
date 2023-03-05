@@ -188,7 +188,7 @@ public class KVServer implements IKVServer, Runnable {
 		fs.clearStorage();
 		// TODO Auto-generated method stub
 	}
-	public ServerMessage reveivMessage(InputStream input) throws IOException {
+	public ServerMessage receiveMessage(InputStream input) throws IOException {
 		int index = 0;
         byte[] msgBytes = null, tmp = null;
         byte[] bufferBytes = new byte[1024];
@@ -246,6 +246,19 @@ public class KVServer implements IKVServer, Runnable {
         ServerMessage msg = new ServerMessage(msgBytes);
 		return msg;
 	}
+
+	public void updateZnodeMetadata(String metadata) {
+		try {
+			this.zk.setData(metadataPath, metadata.getBytes(), this.zk.exists(metadataPath, true).getVersion());
+			logger.info("Updated znode metadata");
+		}
+		catch (KeeperException ex) {
+			logger.error("Failed to update znode metadata");
+		}
+		catch (InterruptedException ex) {
+			logger.error("Failed to update znode metadata");
+		}
+	}
 	public void transferKV(String[] hashRange, String server){
 		Map<String, String> move_map = fs.move_batch(hashRange);
 		String kvPairs = move_map.toString();
@@ -263,7 +276,7 @@ public class KVServer implements IKVServer, Runnable {
             output.write(msgBytes, 0, msgBytes.length);
             output.flush();
 			
-			ServerMessage reply = reveivMessage(input);
+			ServerMessage reply = receiveMessage(input);
 			
 			if(reply.getServerStatus() == ServerMessageStatus.SEND_KV_ACK){
 				fs.move_kv_done(move_map);

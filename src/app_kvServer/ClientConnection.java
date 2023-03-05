@@ -163,7 +163,7 @@ public class ClientConnection implements Runnable {
             ECSNode serverNode = this.server.getMetadataObj().findNode(ServerPositionKey);
             String[] key_range = serverNode.getNodeHashRange();
             this.server.transferKV(key_range, serverToCon);
-
+            this.server.updateZnodeMetadata(msg.getMetadata());
         }
         else if (msg.getStatus() == ECSMessage.ECSMessageStatus.RECEIVE) {
             // Update local metadata
