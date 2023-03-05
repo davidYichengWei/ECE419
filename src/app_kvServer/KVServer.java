@@ -300,14 +300,13 @@ public class KVServer implements IKVServer, Runnable {
 		Map<String, String> move_map = fs.move_batch(hashRange);
 		// move_map.put("------------", "++++++++++++++++++");
 		String kvPairs = convert_map_string(move_map);
-		
 		String[] dest = server.split(":");
 		
 		try {
 			Socket socket = new Socket(dest[0], Integer.parseInt(dest[1]));
 			System.out.println(dest[0]);
 			System.out.println(dest[1]);
-
+	
 			OutputStream output = socket.getOutputStream();
 			InputStream input = socket.getInputStream();
 			System.out.println("TRANSFERING KV PAIRS" +kvPairs);
