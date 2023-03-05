@@ -138,7 +138,7 @@ public class FileStorage implements IFileStorage{
                 String HashKey = MD5Hasher.hash(i);
                 System.out.println(i+"    THIS IS HASHKEY_______    "+HashKey);
                 System.out.println("    Comparator2    "+ HashKey.compareTo(begin) +"    " +HashKey.compareTo(end));
-                if (HashKey.compareTo(begin) > 0 && HashKey.compareTo(end) < 0) {
+                if ((HashKey.compareTo(begin) < 0) && (HashKey.compareTo(end) > 0)) {
 
                     movedKV.put(i, hash_table.get(i));
                     System.out.println(i+"    1111111111111111    "+hash_table.get(i));
