@@ -140,15 +140,38 @@ public class PerformanceTest {
 
         System.out.println("Number of short puts: "+ Integer.toString(numPut)+ "_____Running time for this test is " + (endTime - startTime) + "ms"); 
     }
+    public void scan_folder(String path){
+        File f = new File("/Users/beale/Desktop/maildir/allen-p/sent"); 
+        Map<String, String> pairs = new HashMap<String, String>();
+        File fileList[] = f.listFiles();
+        try{
+            for (File file : fileList) {
+                System.out.println(file);
+                String one_file = "";          
+                InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
+                BufferedReader br = new BufferedReader(reader);
+                String stringLine;
+                while ((stringLine=br.readLine())!=null) {
+                    // System.out.println(stringLine);
+                    one_file+=stringLine;
+                }
+                pairs.put(file.getName(), one_file);
+                // System.out.println(one_file);
+            }
+        }
 
+        catch(Exception e){
+        }
+    }
     public static void main(String[] args) {
         PerformanceTest p =  new PerformanceTest();
         // p.performancePutShort(0, 1000);
     //     p.server.clearStorage();
         // p.performancePutMedium(0, 1000);
         // p.server.clearStorage();
-        p.performance20Put80Get(800, 200);
+        // p.performance20Put80Get(800, 200);
 
-        p.server.clearStorage();
+        // p.server.clearStorage();
+        p.scan_folder("");
     }
 }
