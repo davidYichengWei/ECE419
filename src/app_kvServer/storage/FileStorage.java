@@ -115,22 +115,30 @@ public class FileStorage implements IFileStorage{
         String end = hash_range[1];
         String cycle_begin = "00000000000000000000000000000000";
         String cycle_end = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-
+        System.out.println("    BEGIN:_____"+begin+"_____");
+        System.out.println("    END:_____"+end+"_____");
         Map<String, String> movedKV = new HashMap<String, String>();
-        if(end.compareToIgnoreCase(begin)>0){
+        if(end.compareTo(begin)>0){
             for(String i:hash_table.keySet()){
                 String HashKey = MD5Hasher.hash(i);
-                if (HashKey.compareTo(begin) < 0 && HashKey.compareTo(end) > 0) {
+                System.out.println(i+"    THIS IS HASHKEY_______"+HashKey+ "___");
+                System.out.println("    Comparator1    "+ HashKey.compareTo(begin) +"    " +HashKey.compareTo(end));
+                if (HashKey.compareTo(begin) < 0 || HashKey.compareTo(end) > 0) {
                     movedKV.put(i, hash_table.get(i));
+                    System.out.println(i+"    1111111111111111111111111111111    "+hash_table.get(i));
                     logger.info("Moving key: "+i+" value: "+hash_table.get(i));
                 }
             }
         }
-        else if(end.compareToIgnoreCase(begin)<0){
+        else if(end.compareTo(begin)<0){
             for(String i:hash_table.keySet()){
                 String HashKey = MD5Hasher.hash(i);
+                System.out.println(i+"    THIS IS HASHKEY_______    "+HashKey);
+                System.out.println("    Comparator2    "+ HashKey.compareTo(begin) +"    " +HashKey.compareTo(end));
                 if (HashKey.compareTo(begin) > 0 && HashKey.compareTo(end) < 0) {
+
                     movedKV.put(i, hash_table.get(i));
+                    System.out.println(i+"    1111111111111111    "+hash_table.get(i));
                     logger.info("Moving key: "+i+" value: "+hash_table.get(i));
                 }
             }
@@ -145,9 +153,15 @@ public class FileStorage implements IFileStorage{
         storeKVInFile();
 
     }
+    public void display(){
+        for(String i:hash_table.keySet()){
+            System.out.println(i+"++++++++++++++++++++++"+hash_table.get(i));
+        }
+    }
     public void receive_pairs(Map<String, String> batch){
         for(String i:batch.keySet()){
             hash_table.put(i, batch.get(i));
+            System.out.println(i+"    RRRRRRRRRRRRRRRRRRRRRRRRR receiving pairs      "+hash_table.get(i));
         }
         storeKVInFile();
     }

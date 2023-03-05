@@ -120,7 +120,12 @@ public class ClientConnection implements Runnable {
         ServerMessageStatus status = msg.getServerStatus();
         System.out.println("ServerMessage received: Transmitting KV pairs.");
         if(status == ServerMessage.ServerMessageStatus.SEND_KV){
+            
             Map<String, String> pairs = msg.getPairs();
+            for(String i:pairs.keySet()){
+                System.out.println(i+"--------------------------------"+pairs.get(i));
+
+            }
             this.server.receiveKV(pairs);
             ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV_ACK, "");
             sendServerMessage(reply);
@@ -162,6 +167,7 @@ public class ClientConnection implements Runnable {
             String ServerPositionKey = MD5Hasher.hash(hostPort);
             ECSNode serverNode = this.server.getMetadataObj().findNode(ServerPositionKey);
             String[] key_range = serverNode.getNodeHashRange();
+            // System.out.println("TRANSFER STATUS--------running transfer KV");
             this.server.transferKV(key_range, serverToCon);
             this.server.updateZnodeMetadata(msg.getMetadata());
         }

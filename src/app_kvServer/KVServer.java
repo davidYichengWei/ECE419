@@ -260,9 +260,20 @@ public class KVServer implements IKVServer, Runnable {
 			logger.error("Failed to update znode metadata");
 		}
 	}
+	public String convert_map_string(Map<String, String> hash){
+		String temp="";
+		for(String i:hash.keySet()){
+			String one_pair=i+"&&&&&"+hash.get(i);
+			temp+=one_pair;
+			temp+=";;;;;";
+		}
+		return temp;
+	}
 	public void transferKV(String[] hashRange, String server){
 		Map<String, String> move_map = fs.move_batch(hashRange);
-		String kvPairs = move_map.toString();
+		// move_map.put("------------", "++++++++++++++++++");
+		String kvPairs = convert_map_string(move_map);
+		
 		String[] dest = server.split(":");
 		
 		try {
@@ -272,6 +283,7 @@ public class KVServer implements IKVServer, Runnable {
 
 			OutputStream output = socket.getOutputStream();
 			InputStream input = socket.getInputStream();
+			System.out.println("TRANSFERING KV PAIRS" +kvPairs);
 			ServerMessage msg = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV, kvPairs);
             byte[] msgBytes = msg.toByteArray();
             output.write(msgBytes, 0, msgBytes.length);
@@ -301,12 +313,15 @@ public class KVServer implements IKVServer, Runnable {
 		
 		
 	}
+
 	public void receiveKV(Map<String, String> batch){
 		fs.receive_pairs(batch);
 	}
+	
 	// Shutdown hook triggered when KVServer is stopped with ctrl+c
 	// Delete znode for the KVServer and wait to process ECSMessage
 	public void shutDown() {
+		fs.display();
 		shuttingDown = true;
 		deleteZnode();
 

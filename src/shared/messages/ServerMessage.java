@@ -34,9 +34,9 @@ public class ServerMessage implements Serializable {
     }
     public Map<String, String> getPairs(){
         Map<String, String> temp = new HashMap<String, String>();
-        String[] strings = this.KVPairs.split(",");
+        String[] strings = this.KVPairs.split(";;;;;");
         for (String str : strings) {
-            String[] s = str.split("=");
+            String[] s = str.split("&&&&&");
             if(s.length==2)
                 temp.put(s[0],s[1]);
         }
