@@ -120,7 +120,7 @@ public class KVStore implements KVCommInterface {
 		while(!requestSuccessful) {
 			//Find responsible server
 			ECSNode responsibleNode = metadata.findNode(HashKey);
-			if (responsibleNode.getNodeHost() != this.getServerAdress() || responsibleNode.getNodePort() != this.getServerPort() ) {
+			if (!responsibleNode.getNodeHost().equals(this.getServerAdress()) || responsibleNode.getNodePort() != this.getServerPort()) {
 				String ip = responsibleNode.getNodeHost();
 				int port = responsibleNode.getNodePort();
 				this.setServerAdress(ip);
@@ -137,6 +137,7 @@ public class KVStore implements KVCommInterface {
 				String keyRanges = keyValueResponse.getValue();
 				String newListPorts = MD5Hasher.buildListOfPorts(keyRanges);
 				metadata = new Metadata(newListPorts);
+				System.out.println("Updating metadata");
 			}
 			else {
 				requestSuccessful = true;
