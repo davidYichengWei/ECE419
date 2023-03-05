@@ -2,10 +2,12 @@ package app_kvClient;
 
 import client.KVCommInterface;
 import client.KVStore;
+import ecs.ECSNode;
 import logger.LogSetup;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import shared.messages.Message;
+import shared.module.MD5Hasher;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -111,8 +113,23 @@ public class KVClient implements IKVClient {
                     if (keyBytes.length > 20 || valueBytes.length > 120 * 1024) {
                         printError("Key must be a max length of 20 bytes and value must be a max length of 120 kiloBytes.");
                     } else {
-                        Message response = (Message) keyValueStore.put(key, value);
-                        System.out.println("Received Response: {" + response.getStatus() + ", <" + key + ", " + value + ">}");
+                        boolean serverUp = true;
+                        try {
+                            Message response = (Message) keyValueStore.put(key, value);
+                            if (response == null) {
+                                serverUp = false;
+                            } else {
+                                value = response.getValue();
+                                System.out.println("Received Response: {" + response.getStatus() + ", <" + key + ", " + value + ">}");
+                            }
+                        } catch (Exception e) {
+                            serverUp = false;
+                            value = null;
+                        }
+                        if (!serverUp) {
+                            System.out.println("Failed to receive response from KVServer, attempting to contact other KVServer in cached metadata");
+                            this.retryKVServerRequest("put", key, value);
+                        }
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -127,12 +144,22 @@ public class KVClient implements IKVClient {
             else if (tokens.length == 2) {
                 String key = tokens[1];
                 String value;
+                boolean serverUp = true;
                 try {
                     Message response = (Message) keyValueStore.get(key);
-                    value = response.getValue();
-                    System.out.println("Received Response: {" + response.getStatus() + ", <" + key + ", " + value + ">}");
+                    if (response == null) {
+                        serverUp = false;
+                    } else {
+                        value = response.getValue();
+                        System.out.println("Received Response: {" + response.getStatus() + ", <" + key + ", " + value + ">}");
+                    }
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    serverUp = false;
+                    value = null;
+                }
+                if (!serverUp) {
+                    System.out.println("Failed to receive response from KVServer, attempting to contact other KVServer in cached metadata");
+                    this.retryKVServerRequest("get", key, null);
                 }
             } else {
                 this.printError("Invalid number of parameters!");
@@ -154,6 +181,86 @@ public class KVClient implements IKVClient {
             printHelp();
         }
     }
+
+    private void retryKVServerRequest(String method, String key, String value) {
+        // Remove current connection from metadata
+        serverAddress = keyValueStore.getServerAdress();
+        serverPort = keyValueStore.getServerPort();
+        String hostPort = serverAddress + ":" + String.valueOf(serverPort);
+        String serverPositionKey = MD5Hasher.hash(hostPort);
+        ECSNode search = keyValueStore.getMetadata().findNode(serverPositionKey);
+        keyValueStore.getMetadata().removeNode(search);
+
+        boolean connectionSuccessful = false;
+        for (ECSNode node :  keyValueStore.getMetadata().getTree()) {
+            try{
+                serverAddress = node.getNodeHost();
+                serverPort = node.getNodePort();
+                System.out.println("Attempting to connect to " + serverAddress + ":" + serverPort);
+                newConnection(serverAddress, serverPort);
+                connectionSuccessful = true;
+                break;
+            } catch(NumberFormatException nfe) {
+                printError("No valid address. Port must be a number!");
+                logger.info("Unable to parse argument <port>", nfe);
+                keyValueStore.getMetadata().removeNode(node);
+            } catch (UnknownHostException e) {
+                printError("Unknown Host!");
+                logger.info("Unknown Host!", e);
+                keyValueStore.getMetadata().removeNode(node);
+            } catch (Exception e) {
+                printError("Could not establish connection!");
+                logger.warn("Could not establish connection!", e);
+                keyValueStore.getMetadata().removeNode(node);
+            }
+        }
+        if (!connectionSuccessful) {
+            System.out.println("Failed to contact other KVServer(s) in cached metadata");
+            disconnect();
+            return;
+        }
+
+        // Issue request again
+        if (method.equals("put")) {
+            boolean serverUp = false;
+            try {
+                Message response = (Message) keyValueStore.put(key, value);
+                if (response == null) {
+                    serverUp = false;
+                } else {
+                    value = response.getValue();
+                    System.out.println("Received Response: {" + response.getStatus() + ", <" + key + ", " + value + ">}");
+                }
+            } catch (Exception e) {
+                serverUp = false;
+                value = null;
+            }
+            if (!serverUp) {
+                System.out.println("Failed to receive response from KVServer, attempting to contact other KVServer in cached metadata");
+                this.retryKVServerRequest("put", key, value);
+            }
+        }
+        else if (method.equals("get")) {
+            boolean serverUp = true;
+            try {
+                Message response = (Message) keyValueStore.get(key);
+                if (response == null) {
+                    serverUp = false;
+                } else {
+                    value = response.getValue();
+                    System.out.println("Received Response: {" + response.getStatus() + ", <" + key + ", " + value + ">}");
+                }
+            } catch (Exception e) {
+                serverUp = false;
+                value = null;
+            }
+            if (!serverUp) {
+                System.out.println("Failed to receive response from KVServer, attempting to contact other KVServer in cached metadata");
+                this.retryKVServerRequest("get", key, null);
+            }
+        }
+    }
+
     private void printPossibleLogLevels() {
         System.out.println("KVClient> Possible log levels are:");
         System.out.println("KVClient> ALL | DEBUG | INFO | WARN | ERROR | FATAL | OFF");

@@ -47,6 +47,10 @@ public class KVStore implements KVCommInterface {
 		this.serverPort = serverPort;
 	}
 
+	public Metadata getMetadata() {
+		return metadata;
+	}
+
 	@Override
 	public void connect() throws UnknownHostException {
 		// TODO Auto-generated method stub
@@ -90,7 +94,13 @@ public class KVStore implements KVCommInterface {
 				this.connect();
 			}
 			this.clientCommunicationModule.sendMessage(putRequest);
-			response = this.clientCommunicationModule.receiveMessage();
+			try {
+				response = this.clientCommunicationModule.receiveMessage();
+			} catch (IOException e) {
+				// handle exception
+				System.err.println("Error receiving message: " + e.getMessage());
+				throw e;
+			}
 
 			// If server not responsible, update Metadata
 			if (response.getStatus() == KVMessage.StatusType.SERVER_NOT_RESPONSIBLE) {
@@ -128,7 +138,13 @@ public class KVStore implements KVCommInterface {
 				this.connect();
 			}
 			this.clientCommunicationModule.sendMessage(getRequest);
-			response = this.clientCommunicationModule.receiveMessage();
+			try {
+				response = this.clientCommunicationModule.receiveMessage();
+			} catch (IOException e) {
+				// handle exception
+				System.err.println("Error receiving message: " + e.getMessage());
+				throw e;
+			}
 
 			// If server not responsible, update Metadata
 			if (response.getStatus() == KVMessage.StatusType.SERVER_NOT_RESPONSIBLE) {
