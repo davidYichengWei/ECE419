@@ -163,7 +163,7 @@ public class ClientConnection implements Runnable {
             // catch (IOException ioe) {
             //     logger.error("Error! Unable to send KV pairs to another server!", ioe);
             // }
-            String hostPort = this.server.getHostname();
+            String hostPort = this.server.getHostname() + ":" + String.valueOf(server.getPort());
             String ServerPositionKey = MD5Hasher.hash(hostPort);
             ECSNode serverNode = this.server.getMetadataObj().findNode(ServerPositionKey);
             String[] key_range = serverNode.getNodeHashRange();
