@@ -98,7 +98,7 @@ public class KVServer implements IKVServer, Runnable {
 		new Thread(this).start(); // To prevent blocking in tests
 	}
 
-	public boolean getShutdownFinished() {
+	public synchronized boolean getShutdownFinished() {
 		return shutdownFinished;
 	}
 
@@ -295,7 +295,7 @@ public class KVServer implements IKVServer, Runnable {
 		deleteZnode();
 
 		System.out.println("Shutting down KVServer ...");
-		while(getShutdownFinished() == false) {
+		while(!getShutdownFinished()) {
 			// Wait for ECSMessage
 			// Need to set shutdownFinished to true at the end of data transfer
 		}
