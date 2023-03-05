@@ -176,6 +176,10 @@ public class ClientConnection implements Runnable {
             }
             
             this.server.updateZnodeMetadata(msg.getMetadata());
+
+            if (this.server.getShuttingDown()) {
+                server.setShutdownFinished(true);
+            }
         }
         else if (msg.getStatus() == ECSMessage.ECSMessageStatus.RECEIVE) {
             // Update local metadata
