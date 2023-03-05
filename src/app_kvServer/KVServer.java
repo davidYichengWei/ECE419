@@ -46,6 +46,8 @@ public class KVServer implements IKVServer, Runnable {
 	private ClientConnection serverConnection;
 	private ServerStatus status;
 
+	private boolean shuttingDown = false;
+
 	public void setMetadata(String metadata) {
 		this.metadata = metadata;
 		this.metadataObj = new Metadata(metadata);
@@ -102,6 +104,14 @@ public class KVServer implements IKVServer, Runnable {
 
 	public void setShutdownFinished(boolean shutdownFinished) {
 		this.shutdownFinished = shutdownFinished;
+	}
+
+	public boolean getShuttingDown() {
+		return shuttingDown;
+	}
+
+	public void setShuttingDown(boolean shuttingDown) {
+		this.shuttingDown = shuttingDown;
 	}
 
 	public void deleteZnode() {
@@ -178,7 +188,7 @@ public class KVServer implements IKVServer, Runnable {
 		fs.clearStorage();
 		// TODO Auto-generated method stub
 	}
-	public ServerMessage reveivMessage(InputStream input){
+	public ServerMessage reveivMessage(InputStream input) throws IOException {
 		int index = 0;
         byte[] msgBytes = null, tmp = null;
         byte[] bufferBytes = new byte[1024];
@@ -252,10 +262,20 @@ public class KVServer implements IKVServer, Runnable {
             byte[] msgBytes = msg.toByteArray();
             output.write(msgBytes, 0, msgBytes.length);
             output.flush();
+			
 			ServerMessage reply = reveivMessage(input);
+			
 			if(reply.getServerStatus() == ServerMessageStatus.SEND_KV_ACK){
 				fs.move_kv_done(move_map);
-				ServerMessage runMsg = new ServerMessage(ServerMessage.ServerMessageStatus.SET_RUNNING, "");
+				if (shuttingDown == false) {
+					// SEND SET_RUNNING to serverToContact
+					ServerMessage runMsg = new ServerMessage(ServerMessage.ServerMessageStatus.SET_RUNNING, "");
+
+				}
+				else {
+					// Set shutdownFinished to true
+					shutdownFinished = true;
+				}
 			}
 			
         } catch (IOException e) {
@@ -271,6 +291,7 @@ public class KVServer implements IKVServer, Runnable {
 	// Shutdown hook triggered when KVServer is stopped with ctrl+c
 	// Delete znode for the KVServer and wait to process ECSMessage
 	public void shutDown() {
+		shuttingDown = true;
 		deleteZnode();
 
 		System.out.println("Shutting down KVServer ...");

@@ -139,12 +139,13 @@ public class ClientConnection implements Runnable {
     
     // Handle ECS message, start data transfer if needed
     public void handleECSMessage(ECSMessage msg) {
+        System.out.println("ECSMessage received: " + msg.getStatus() + " " 
+            + msg.getMetadata() + " " + msg.getServerToContact());
+
         String keyRangeMessage = msg.getMetadata();
         String listHostPorts = MD5Hasher.buildListOfPorts(keyRangeMessage);
         this.server.setMetadata(listHostPorts);
         String serverToCon = msg.getServerToContact();
-        System.out.println("ECSMessage received: " + msg.getStatus() + " " 
-            + msg.getMetadata() + " " + msg.getServerToContact());
         
         // Reply to ECS server with ACK
         ECSMessage ecsReply = new ECSMessage(ECSMessage.ECSMessageStatus.ACK, null, null);
@@ -170,10 +171,16 @@ public class ClientConnection implements Runnable {
 
         }
         else if (msg.getStatus() == ECSMessage.ECSMessageStatus.NO_TRANSFER) {
-
             // If first server added, updated metadata, set state to RUNNING
-            
-            // If last server removed, keep shutting down
+            if (server.getShuttingDown() == false) {
+                logger.info("First server added, setting state to RUNNING directly");
+                server.setStatus(IKVServer.ServerStatus.RUNNING);
+            }
+            else { // If last server removed, keep shutting down
+                logger.info("Last server removed, just shut down");
+                // Should we delete the data on the last server?
+                server.setShutdownFinished(true);
+            }
         }
 
     }
