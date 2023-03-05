@@ -81,11 +81,11 @@ public class ClientConnection implements Runnable {
                     } 
                     else {
                         logger.error("Unknown message type received");
+                        sendFailedMessage("FAILED Message format unknown!");
                     }
                 }
                 catch (IllegalArgumentException iae) {
                     logger.error("Error! Unable to parse message", iae);
-                    sendFailedMessage("FAILED Message format unknown!");
                 }
                 catch (IOException ioe) {
                     logger.error("Error! Connection lost!");
@@ -332,7 +332,14 @@ public class ClientConnection implements Runnable {
                 return MessageType.ECS_Message;
             }
             catch (IllegalArgumentException iae2) {
-                return MessageType.Server_Message;
+                try {
+                    ServerMessage msg = new ServerMessage(msgBytes);
+                    return MessageType.Server_Message;
+                }
+                catch (IllegalArgumentException iae3) {
+                    return MessageType.Unknown;
+                }
+                
             }
         }
     }
