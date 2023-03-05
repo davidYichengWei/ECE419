@@ -35,6 +35,7 @@ public class AllTests {
 		clientSuite.addTestSuite(InteractionTest.class); 
 		clientSuite.addTestSuite(AdditionalTest.class);
 		clientSuite.addTestSuite(MetadataTest.class);
+		clientSuite.addTestSuite(MultiServerTest.class);
 		return clientSuite;
 	}
 	
