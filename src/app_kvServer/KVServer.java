@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.net.InetAddress;
 import app_kvServer.storage.FileStorage;
 import org.slf4j.LoggerFactory; // Required for ZooKeeper
@@ -278,7 +279,7 @@ public class KVServer implements IKVServer, Runnable {
 			Socket socket = new Socket(dest[0], Integer.parseInt(dest[1]));
 			System.out.println(dest[0]);
 			System.out.println(dest[1]);
-
+			this.status = ServerStatus.SERVER_WRITE_LOCK;
 			OutputStream output = socket.getOutputStream();
 			InputStream input = socket.getInputStream();
 			System.out.println("TRANSFERING KV PAIRS" +kvPairs);
@@ -291,6 +292,7 @@ public class KVServer implements IKVServer, Runnable {
 			if(reply.getServerStatus() == ServerMessageStatus.SEND_KV_ACK){
 				fs.clearStorage();
 			}
+			this.status = ServerStatus.RUNNING;
 		} catch (IOException e) {
             logger.error("Error dumping Server message: " + e.getMessage(), e);
         }
@@ -306,7 +308,7 @@ public class KVServer implements IKVServer, Runnable {
 			Socket socket = new Socket(dest[0], Integer.parseInt(dest[1]));
 			System.out.println(dest[0]);
 			System.out.println(dest[1]);
-	
+			this.status = ServerStatus.SERVER_WRITE_LOCK;
 			OutputStream output = socket.getOutputStream();
 			InputStream input = socket.getInputStream();
 			System.out.println("TRANSFERING KV PAIRS" +kvPairs);
@@ -318,6 +320,7 @@ public class KVServer implements IKVServer, Runnable {
 			ServerMessage reply = receiveMessage(input);
 			
 			if(reply.getServerStatus() == ServerMessageStatus.SEND_KV_ACK){
+
 				fs.move_kv_done(move_map);
 				if (shuttingDown == false) {
 					// SEND SET_RUNNING to serverToContact
@@ -331,6 +334,7 @@ public class KVServer implements IKVServer, Runnable {
 					shutdownFinished = true;
 				}
 			}
+			this.status = ServerStatus.RUNNING;
 			
         } catch (IOException e) {
             logger.error("Error sending Server message: " + e.getMessage(), e);
