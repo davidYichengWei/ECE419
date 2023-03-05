@@ -215,11 +215,24 @@ public class KVClient implements IKVClient {
         try {
             new LogSetup("logs/client.log", Level.ALL);
             KVClient app = new KVClient();
+
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    app.shutDown();
+                }
+            });
+
             app.run();
         } catch (IOException e) {
             System.out.println("Error! Unable to initialize logger!");
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private void shutDown() {
+        stop = true;
+        this.disconnect();
     }
 }
