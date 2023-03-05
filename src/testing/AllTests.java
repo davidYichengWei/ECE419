@@ -16,6 +16,12 @@ public class AllTests {
 		try {
 			new LogSetup("logs/testing/test.log", Level.ERROR);
 			KVServer server = new KVServer("localhost", 50000, 10, "FIFO", "db_files");
+			// Wait for 5 seconds to allow the server to start
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			server.clearStorage();
 		} catch (IOException e) {
 			e.printStackTrace();

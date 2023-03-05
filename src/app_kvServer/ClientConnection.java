@@ -352,6 +352,12 @@ public class ClientConnection implements Runnable {
      */
     public void sendClientMessage(Message msg) {
         try {
+            logger.info("KVServer: sending response to \t<"
+                    + clientSocket.getInetAddress().getHostAddress() + ":"
+                    + clientSocket.getPort() + ">: {"
+                    + msg.getStatus() + ", <"
+                    + msg.getKey() + ", "
+                    + msg.getValue() + ">}");
             byte[] msgBytes = msg.toByteArray();
             output.write(msgBytes, 0, msgBytes.length);
             output.flush();
