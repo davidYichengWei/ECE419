@@ -222,6 +222,7 @@ public class ClientConnection implements Runnable {
                 return;
             }
             String keyHash = MD5Hasher.hash(msg.getKey());
+            logger.info("keyHash is " + keyHash);
             ECSNode current = server.getMetadataObj().findNode(keyHash);
             if (!server.getHostname().equals(current.getNodeHost()) || server.getPort() != current.getNodePort()) {
                 KVMessage.StatusType status = KVMessage.StatusType.SERVER_NOT_RESPONSIBLE;

@@ -86,7 +86,7 @@ public class KVServer implements IKVServer, Runnable {
 
 		// To be able to call clearStorage() at test setup
 		try {
-			fs = new FileStorage(fileDirectory);
+			fs = new FileStorage(fileDirectory, serverAddress + ":" + port);
 		}
 		catch (Exception ex) {
 			logger.error(ex);

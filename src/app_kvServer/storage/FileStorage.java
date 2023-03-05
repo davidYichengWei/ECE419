@@ -12,14 +12,15 @@ import shared.module.MD5Hasher;
 public class FileStorage implements IFileStorage{
     private static Logger logger = Logger.getRootLogger();
     public final String file_path;
-    public final String file_name = "db.properties";
+    private String file_name;
     private Integer key_max_len = 20;
     private Integer value_max_len = 120000;
     private Map<String, String> hash_table;
     private File db_file;
     
-    public FileStorage(String file_path) throws Exception{
+    public FileStorage(String file_path, String hostPort) throws Exception{
         this.file_path = file_path;
+        this.file_name = hostPort+".properties";
         initialize();
     }
     private void initialize() throws Exception{
@@ -121,6 +122,7 @@ public class FileStorage implements IFileStorage{
                 String HashKey = MD5Hasher.hash(i);
                 if (HashKey.compareTo(begin) < 0 && HashKey.compareTo(end) > 0) {
                     movedKV.put(i, hash_table.get(i));
+                    logger.info("Moving key: "+i+" value: "+hash_table.get(i));
                 }
             }
         }
@@ -129,6 +131,7 @@ public class FileStorage implements IFileStorage{
                 String HashKey = MD5Hasher.hash(i);
                 if (HashKey.compareTo(begin) > 0 && HashKey.compareTo(end) < 0) {
                     movedKV.put(i, hash_table.get(i));
+                    logger.info("Moving key: "+i+" value: "+hash_table.get(i));
                 }
             }
         }
