@@ -22,8 +22,12 @@ public class ServerMessage implements Serializable {
         byte[] bytes = addCtrChars(encodedStringBytes);
         String encodedString = new String(bytes).trim();
         String[] parts = encodedString.split(DELIMITER);
+        System.out.println("encodedString" + encodedString);
         this.status = ServerMessageStatus.valueOf(parts[0].toUpperCase());
-        this.KVPairs = parts[1];
+        if(parts.length >1)
+            this.KVPairs = parts[1];
+        else
+            this.KVPairs = "";
     }
     public ServerMessageStatus getServerStatus(){
         return this.status;
