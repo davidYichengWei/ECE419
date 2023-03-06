@@ -3,20 +3,24 @@ import app_kvClient.KVClient;
 import app_kvServer.KVServer;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 public class PerformanceTest {
     private KVServer[] server_list;
 
     public PerformanceTest() {
         try {
+            long  startTime = System.currentTimeMillis(); 
+        
+            int i=0;
             // this.server = new KVServer("127.0.0.1", 8080, 2000, "LRU", "db_files");
-            this.server_list = new KVServer[5];
-            this.server_list[0] = new KVServer("127.0.0.1", 10000, 2000, "LRU", "db_files");
-            
-            this.server_list[1] = new KVServer("127.0.0.1", 10001, 2000, "LRU", "db_files");
-            this.server_list[2] = new KVServer("127.0.0.1", 10002, 2000, "LRU", "db_files");
-            this.server_list[3] = new KVServer("127.0.0.1", 10003, 2000, "LRU", "db_files");
-            this.server_list[4] = new KVServer("127.0.0.1", 10004, 2000, "LRU", "db_files");
-            
+            this.server_list = new KVServer[10];
+            for(i=0;i<5;i++){
+                this.server_list[i] = new KVServer("127.0.0.1", 10200+i, 2000, "LRU", "db_files");
+                // TimeUnit.SECONDS.sleep(1);
+            }
+            long endTime = System.currentTimeMillis();
+        long res = endTime-startTime;
+        System.out.println("time to create" +i+" servers:________________________________"+ res);
         } catch (Exception e) {
             
         }
@@ -174,11 +178,17 @@ public class PerformanceTest {
     public void run_tests(){
         long  startTime = System.currentTimeMillis(); 
         
-
+        this.server_list[0].
         long endTime = System.currentTimeMillis();
     }
     public static void main(String[] args) {
+        long  startTime = System.currentTimeMillis(); 
         PerformanceTest p =  new PerformanceTest();
+        p=null;
+        long endTime = System.currentTimeMillis();
+        long res = endTime-startTime;
+        System.out.println("time to create 5 servers:"+ res);
+        
         // p.performancePutShort(0, 1000);
     //     p.server.clearStorage();
         // p.performancePutMedium(0, 1000);
@@ -186,6 +196,6 @@ public class PerformanceTest {
         // p.performance20Put80Get(800, 200);
 
         // p.server.clearStorage();
-        p.scan_folder("");
+        // p.scan_folder("");
     }
 }
