@@ -66,7 +66,7 @@ public class MultiServerTest extends TestCase {
             }
 
             assert ex == null;
-            if (response.getStatus() == StatusType.KEYRANGE_SUCESS) {
+            if (response.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
                 redirected = true;
                 break;
             }
@@ -89,7 +89,7 @@ public class MultiServerTest extends TestCase {
             }
     
             assertTrue(ex == null && 
-                (response.getStatus() == StatusType.GET_ERROR || response.getStatus() == StatusType.KEYRANGE_SUCESS));
+                (response.getStatus() == StatusType.GET_ERROR || response.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE));
         }
     }
 
@@ -106,7 +106,7 @@ public class MultiServerTest extends TestCase {
             }
     
             assertTrue(ex == null && 
-                (response.getStatus() == StatusType.PUT_SUCCESS || response.getStatus() == StatusType.KEYRANGE_SUCESS));
+                (response.getStatus() == StatusType.PUT_SUCCESS || response.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE));
         }
     }
 
@@ -123,7 +123,7 @@ public class MultiServerTest extends TestCase {
             }
     
             assertTrue(ex == null && 
-                (response.getStatus() == StatusType.PUT_UPDATE || response.getStatus() == StatusType.KEYRANGE_SUCESS));
+                (response.getStatus() == StatusType.PUT_UPDATE || response.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE));
         }
     }
 
@@ -140,7 +140,7 @@ public class MultiServerTest extends TestCase {
             }
     
             assertTrue(ex == null && 
-                (response.getStatus() == StatusType.DELETE_SUCCESS || response.getStatus() == StatusType.KEYRANGE_SUCESS));
+                (response.getStatus() == StatusType.DELETE_SUCCESS || response.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE));
         }
     }
 
