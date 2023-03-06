@@ -178,7 +178,6 @@ public class PerformanceTest {
     public void run_tests(){
         long  startTime = System.currentTimeMillis(); 
         
-        this.server_list[0].
         long endTime = System.currentTimeMillis();
     }
     public static void main(String[] args) {

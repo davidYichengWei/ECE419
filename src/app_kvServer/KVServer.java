@@ -80,6 +80,7 @@ public class KVServer implements IKVServer, Runnable {
 	 * @param directory where the database files are stored
 	 */
 	public KVServer(String serverAddress, int port, int cacheSize, String strategy, String fileDirectory) {
+		
 		this.serverAddress = serverAddress;
 		this.port = port;
 		this.cacheSize = cacheSize;
