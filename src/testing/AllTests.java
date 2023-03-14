@@ -15,7 +15,7 @@ public class AllTests {
 	static {
 		try {
 			new LogSetup("logs/testing/test.log", Level.ERROR);
-			KVServer server = new KVServer("localhost", 50000, 10, "FIFO", "db_files");
+			KVServer server = new KVServer("localhost", 50000, "localhost", 10, "FIFO", "db_files");
 			// Wait for 5 seconds to allow the server to start
 			try {
 				Thread.sleep(5000);

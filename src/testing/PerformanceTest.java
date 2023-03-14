@@ -15,7 +15,7 @@ public class PerformanceTest {
             // this.server = new KVServer("127.0.0.1", 8080, 2000, "LRU", "db_files");
             this.server_list = new KVServer[10];
             for(i=0;i<5;i++){
-                this.server_list[i] = new KVServer("127.0.0.1", 10200+i, 2000, "LRU", "db_files");
+                this.server_list[i] = new KVServer("127.0.0.1", 10200+i, "localhost", 2000, "LRU", "db_files");
                 // TimeUnit.SECONDS.sleep(1);
             }
             long endTime = System.currentTimeMillis();

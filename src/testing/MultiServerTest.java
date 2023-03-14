@@ -30,7 +30,7 @@ public class MultiServerTest extends TestCase {
 		}
 
         // Start 2 new servers
-        KVServer server2 = new KVServer("localhost", 50001, 10, "FIFO", "db_files");
+        KVServer server2 = new KVServer("localhost", 50001, "localhost", 10, "FIFO", "db_files");
         // Wait for 5 seconds to allow the server to start
         try {
             Thread.sleep(5000);
@@ -39,7 +39,7 @@ public class MultiServerTest extends TestCase {
         }
         server2.clearStorage();
 
-        KVServer server3 = new KVServer("localhost", 50002, 10, "FIFO", "db_files");
+        KVServer server3 = new KVServer("localhost", 50002, "localhost", 10, "FIFO", "db_files");
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
