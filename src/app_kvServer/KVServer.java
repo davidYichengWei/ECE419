@@ -30,6 +30,7 @@ public class KVServer implements IKVServer, Runnable {
 	// Parameters for server initialization
 	private String serverAddress = "localhost";
 	private int port;
+	private String zkAddress = "localhost";
 	private String logPath;
 	private String logLevel = "ALL";
 
@@ -79,10 +80,11 @@ public class KVServer implements IKVServer, Runnable {
 	 *           and "LFU".
 	 * @param directory where the database files are stored
 	 */
-	public KVServer(String serverAddress, int port, int cacheSize, String strategy, String fileDirectory) {
+	public KVServer(String serverAddress, int port, String zkAddress, int cacheSize, String strategy, String fileDirectory) {
 		
 		this.serverAddress = serverAddress;
 		this.port = port;
+		this.zkAddress = zkAddress;
 		this.cacheSize = cacheSize;
 		this.cacheStrategy = CacheStrategy.valueOf(strategy);
 
@@ -398,7 +400,7 @@ public class KVServer implements IKVServer, Runnable {
 	private boolean initializeZooKeeper() {
 		// Connect to Zookeeper, create a watcher for metadata changes
 		try {
-			zk = new ZooKeeper("localhost:2181", 3000, new Watcher() {
+			zk = new ZooKeeper(zkAddress + ":2181", 3000, new Watcher() {
 				@Override
 				public void process(WatchedEvent event) {
 					try {
@@ -513,6 +515,7 @@ public class KVServer implements IKVServer, Runnable {
 				int port = 8080;
 				String logPath = "logs/server.log";
 				String logLevel = "INFO";
+				String zkAddress = "localhost";
 
 				String curFlag = "-h";
 				for (int i = 0; i < args.length; i++) {
@@ -537,6 +540,9 @@ public class KVServer implements IKVServer, Runnable {
 							case "-ll":
 								logLevel = args[i];
 								break;
+							case "-zk":
+								zkAddress = args[i];
+								break;
 							default:
 								System.out.println("Usage: Server -a <address> -p <port> -d <file directory> -l <log path> -ll <log level>");
 								System.exit(1);
@@ -553,7 +559,7 @@ public class KVServer implements IKVServer, Runnable {
 					System.exit(1);
 				}
 				
-				final KVServer server = new KVServer(address, port, 100, "FIFO", fileDirectory);
+				final KVServer server = new KVServer(address, port, zkAddress, 100, "FIFO", fileDirectory);
 
 				// Add a shutdown hook to process graceful shutdown
 				Runtime.getRuntime().addShutdownHook(new Thread() {
