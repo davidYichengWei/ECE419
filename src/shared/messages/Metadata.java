@@ -88,6 +88,24 @@ public class Metadata implements IMetadata{
         return tree;
     }
 
+    public ECSNode findSuccessor(ECSNode node) {
+        ECSNode successor = tree.ceiling(node);
+        if (node == null) {
+            node = tree.first();
+        }
+        System.out.println("Found node: " + successor.getNodeHost() + ":" + successor.getNodePort() + " with hash range " + Arrays.toString(successor.getNodeHashRange()));
+        return successor;
+    }
+
+    public ECSNode findPredecessor(ECSNode node) {
+        ECSNode predecessor = tree.floor(node);
+        if (node == null) {
+            node = tree.last();
+        }
+        System.out.println("Found node: " + predecessor.getNodeHost() + ":" + predecessor.getNodePort() + " with hash range " + Arrays.toString(predecessor.getNodeHashRange()));
+        return predecessor;
+    }
+
     public String buildListOfHostPorts() {
         // To be used to send to client when server is not responsible, client can then rebuild its metadata
         StringBuilder sb = new StringBuilder();
