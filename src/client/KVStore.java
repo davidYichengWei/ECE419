@@ -9,6 +9,7 @@ import shared.module.MD5Hasher;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 public class KVStore implements KVCommInterface {
 	private ClientCommunication clientCommunicationModule;
@@ -98,9 +99,18 @@ public class KVStore implements KVCommInterface {
 		while(!requestSuccessful) {
 			//Find responsible server
 			ECSNode responsibleNode = metadata.findNode(HashKey);
-			if (responsibleNode.getNodeHost() != this.getServerAdress() || responsibleNode.getNodePort() != this.getServerPort() ) {
-				String ip = responsibleNode.getNodeHost();
-				int port = responsibleNode.getNodePort();
+			ECSNode firstPredecessor = metadata.findPredecessor(responsibleNode);
+			ECSNode secondPredecessor = metadata.findPredecessor(firstPredecessor);
+
+			ECSNode[] nodes = {responsibleNode, firstPredecessor, secondPredecessor};
+
+			Random random = new Random();
+			ECSNode serverToContact = nodes[random.nextInt(nodes.length)];
+
+			if (serverToContact.getNodeHost() != this.getServerAdress() || serverToContact.getNodePort() != this.getServerPort() ) {
+				String ip = serverToContact.getNodeHost();
+				int port = serverToContact.getNodePort();
+				System.out.println("Attempting to send get request to node: " + ip + ":" + port);
 				this.setServerAdress(ip);
 				this.setServerPort(port);
 				this.connect();
