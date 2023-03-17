@@ -118,4 +118,58 @@ public class Metadata implements IMetadata{
         String listOfHostPorts = sb.toString().trim();
         return listOfHostPorts;
     }
+
+    // returns the difference between two Metadata (extra node not shared between M1, M2)
+    public static ECSNode findDifferentNode(Metadata M1, Metadata M2) {
+        ECSNode extraNode = null;
+        TreeSet<ECSNode> tree1 = M1.getTree();
+        TreeSet<ECSNode> tree2 = M2.getTree();
+        if (tree1.size() == tree2.size()) {
+            return extraNode;
+        }
+        TreeSet<ECSNode> biggerTree;
+        TreeSet<ECSNode> smallerTree;
+        if (tree1.size() > tree2.size()) {
+            biggerTree = tree1;
+            smallerTree = tree2;
+        }
+        else {
+            biggerTree = tree2;
+            smallerTree = tree1;
+        }
+        for (ECSNode node : biggerTree) {
+            if (!smallerTree.contains(node)) {
+                extraNode = node;
+                break;
+            }
+        }
+        return extraNode;
+    }
+
+    //returns the responsible range combined with the replicated range for a given ECSNode [from, to]
+    public String[] findTotalRange(ECSNode node) {
+        String from;
+        String to;
+        ECSNode firstPredecessor = this.findPredecessor(node);
+        ECSNode secondPredecessor = this.findPredecessor(firstPredecessor);
+
+        from = secondPredecessor.getNodeHashRange()[0];
+        to = node.getNodeHashRange()[1];
+
+        return new String[] {from, to};
+    }
+
+    // Returns the replicated range for a given ECSNode [from, to]
+    public String[] findReplicatedRange(ECSNode node) {
+        String from;
+        String to;
+        ECSNode firstPredecessor = this.findPredecessor(node);
+        ECSNode secondPredecessor = this.findPredecessor(firstPredecessor);
+
+        from = secondPredecessor.getNodeHashRange()[0];
+        to = firstPredecessor.getNodeHashRange()[1];
+
+        return new String[] {from, to};
+    }
+
 }
