@@ -89,18 +89,18 @@ public class Metadata implements IMetadata{
     }
 
     public ECSNode findSuccessor(ECSNode node) {
-        ECSNode successor = tree.ceiling(node);
-        if (node == null) {
-            node = tree.first();
+        ECSNode successor = tree.higher(node);
+        if (successor == null) {
+            successor = tree.first();
         }
         System.out.println("Found node: " + successor.getNodeHost() + ":" + successor.getNodePort() + " with hash range " + Arrays.toString(successor.getNodeHashRange()));
         return successor;
     }
 
     public ECSNode findPredecessor(ECSNode node) {
-        ECSNode predecessor = tree.floor(node);
-        if (node == null) {
-            node = tree.last();
+        ECSNode predecessor = tree.lower(node);
+        if (predecessor == null) {
+            predecessor = tree.last();
         }
         System.out.println("Found node: " + predecessor.getNodeHost() + ":" + predecessor.getNodePort() + " with hash range " + Arrays.toString(predecessor.getNodeHashRange()));
         return predecessor;
@@ -156,6 +156,10 @@ public class Metadata implements IMetadata{
         from = secondPredecessor.getNodeHashRange()[0];
         to = node.getNodeHashRange()[1];
 
+        if (secondPredecessor.equals(node)) {
+            from = firstPredecessor.getNodeHashRange()[0];
+        }
+
         return new String[] {from, to};
     }
 
@@ -168,6 +172,10 @@ public class Metadata implements IMetadata{
 
         from = secondPredecessor.getNodeHashRange()[0];
         to = firstPredecessor.getNodeHashRange()[1];
+
+        if (secondPredecessor.equals(node)) {
+            from = firstPredecessor.getNodeHashRange()[0];
+        }
 
         return new String[] {from, to};
     }

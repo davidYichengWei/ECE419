@@ -45,4 +45,9 @@ public class ECSNode implements IECSNode {
     public String[] getNodeHashRange() {
         return new String[] {this.keyRangeFrom, this.keyRangeTo};
     }
+
+    public boolean equals(ECSNode node) {
+        return this.host.equals(node.host) &&
+                this.port == node.port;
+    }
 }

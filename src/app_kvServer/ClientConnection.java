@@ -9,6 +9,7 @@ import org.apache.log4j.*;
 import app_kvServer.IKVServer.ServerStatus;
 import shared.messages.KVMessage;
 import shared.messages.Message;
+import shared.messages.Metadata;
 import shared.messages.ECSMessage;
 import shared.module.MD5Hasher;
 import shared.messages.ServerMessage;
@@ -149,7 +150,11 @@ public class ClientConnection implements Runnable {
 
         String keyRangeMessage = msg.getMetadata();
         String listHostPorts = MD5Hasher.buildListOfPorts(keyRangeMessage);
-        this.server.setMetadata(listHostPorts);
+
+        // Update metadata only if it's the first server
+        if (msg.getStatus() == ECSMessage.ECSMessageStatus.NO_TRANSFER) {
+            this.server.setMetadata(keyRangeMessage);
+        }
         String serverToCon = msg.getServerToContact();
         
         // Reply to ECS server with ACK
@@ -165,7 +170,8 @@ public class ClientConnection implements Runnable {
             // }
             String hostPort = this.server.getHostname() + ":" + String.valueOf(server.getPort());
             String ServerPositionKey = MD5Hasher.hash(hostPort);
-            ECSNode serverNode = this.server.getMetadataObj().findNode(ServerPositionKey);
+            Metadata newMetadata = new Metadata(MD5Hasher.buildListOfPorts(keyRangeMessage));
+            ECSNode serverNode = newMetadata.findNode(ServerPositionKey);
             String[] key_range = serverNode.getNodeHashRange();
             // System.out.println("TRANSFER STATUS--------running transfer KV");
             if(this.server.getShuttingDown()){

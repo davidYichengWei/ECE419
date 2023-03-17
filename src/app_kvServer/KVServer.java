@@ -58,7 +58,7 @@ public class KVServer implements IKVServer, Runnable {
 
 	public void setMetadata(String metadata) {
 		this.metadata = metadata;
-		this.metadataObj = new Metadata(metadata);
+		this.metadataObj = new Metadata(MD5Hasher.buildListOfPorts(metadata));
 	}
 
 	public Metadata getMetadataObj() {
@@ -307,7 +307,7 @@ public class KVServer implements IKVServer, Runnable {
 
 	}
 	public void transferKV(String[] hashRange, String server){
-		Map<String, String> move_map = fs.move_batch(hashRange);
+		Map<String, String> move_map = fs.findKVOutOfRange(hashRange);
 		// move_map.put("------------", "++++++++++++++++++");
 		String kvPairs = convert_map_string(move_map);
 		String[] dest = server.split(":");
@@ -329,7 +329,6 @@ public class KVServer implements IKVServer, Runnable {
 			
 			if(reply.getServerStatus() == ServerMessageStatus.SEND_KV_ACK){
 
-				fs.move_kv_done(move_map);
 				if (shuttingDown == false) {
 					// SEND SET_RUNNING to serverToContact
 					ServerMessage runMsg = new ServerMessage(ServerMessage.ServerMessageStatus.SET_RUNNING, "");
@@ -338,6 +337,7 @@ public class KVServer implements IKVServer, Runnable {
             		output.flush();
 				}
 				else {
+					fs.deleteKVBatch(move_map); // only delete KV pairs if shutting down
 					// Set shutdownFinished to true
 					shutdownFinished = true;
 				}
@@ -410,9 +410,11 @@ public class KVServer implements IKVServer, Runnable {
 				public void process(WatchedEvent event) {
 					try {
 						String newData = new String(zk.getData(metadataPath, true, null));
-						if (event.getType() == Event.EventType.NodeDataChanged && !newData.equals(metadata)) {
-							// Process replication and reconsiliation
-							processServerChange(metadata, newData);
+						if (event.getType() == Event.EventType.NodeDataChanged) {
+							if (metadata.equals("initial metadata") == false) {
+								// Process replication and reconsiliation if it's not the new node
+								processServerChange(metadata, newData);
+							}
 
 							metadata = newData;
 							metadataObj = new Metadata(MD5Hasher.buildListOfPorts(metadata));
@@ -456,16 +458,58 @@ public class KVServer implements IKVServer, Runnable {
 
 	// Process replication and reconsiliation when a server is added or removed
 	private void processServerChange(String oldMetadataString, String newMetadataString) {
+		System.out.println("oldMetadataString: " + oldMetadataString);
+		System.out.println("newMetadataString: " + newMetadataString);
 		List<String> oldServerList = new ArrayList<>(Arrays.asList(MD5Hasher.buildListOfPorts(oldMetadataString).split(" ")));
 		List<String> newServerList = new ArrayList<>(Arrays.asList(MD5Hasher.buildListOfPorts(newMetadataString).split(" ")));
 
 		Metadata oldMetadata = new Metadata(MD5Hasher.buildListOfPorts(oldMetadataString));
 		Metadata newMetadata = new Metadata(MD5Hasher.buildListOfPorts(newMetadataString));
 
-		ECSNode nodeChange = Metadata.findDifferentNode(oldServerList, newServerList);
+		ECSNode nodeChange = Metadata.findDifferentNode(oldMetadata, newMetadata);
+		String serverChange = nodeChange.getNodeHost() + ":" + nodeChange.getNodePort();
+		logger.info("serverChange: " + serverChange);
 
 		if (newServerList.size() > oldServerList.size()) {
+			logger.info("A server was added: " + serverChange + ". Processing replication and reconsiliation.");
+			// 1st and 2nd predecessor of the new node need to replicate data to the new node
+			String currentServer = serverAddress + ":" + port;
+			logger.info("currentServer: " + currentServer);
+			ECSNode currentNode = newMetadata.findNode(MD5Hasher.hash(currentServer));
+			System.out.println("Current node: " + currentNode.getNodeHost() + ":" + currentNode.getNodePort());
 
+			ECSNode firstPredecessor = newMetadata.findPredecessor(nodeChange);
+			System.out.println("First predecessor of new node: " + firstPredecessor.getNodeHost() + ":" + firstPredecessor.getNodePort());
+			ECSNode secondPredecessor = newMetadata.findPredecessor(firstPredecessor);
+			System.out.println("Second predecessor of new node: " + secondPredecessor.getNodeHost() + ":" + secondPredecessor.getNodePort());
+
+			if (currentNode.equals(firstPredecessor) || currentNode.equals(secondPredecessor)) {
+				// Replicate data to the new node
+				logger.info("Current server " + currentServer + " is the 1st/2nd predecessor of the new server " 
+					+ serverChange + ". Replicating data to the new server.");
+				
+				// Swap the start and end range to transfer KV pairs in the range
+				String[] range = currentNode.getNodeHashRange();
+				String tmp = range[0];
+				range[0] = range[1];
+				range[1] = tmp;
+				transferKV(range, serverChange);
+			}
+
+			// The 3 successors of the new node need to reconsiliate data
+			ECSNode firstSuccessor = newMetadata.findSuccessor(nodeChange);
+			ECSNode secondSuccessor = newMetadata.findSuccessor(firstPredecessor);
+			ECSNode thirdSuccessor = newMetadata.findSuccessor(secondPredecessor);
+
+			if (currentNode.equals(firstSuccessor) || currentNode.equals(secondSuccessor) || currentNode.equals(thirdSuccessor)) {
+				// Reconsiliate data, delete data out of the combined range of itself and its 2 predecessors
+				logger.info("Current server " + currentServer + " is the 1st/2nd/3rd successor of the new server " 
+					+ serverChange + ". Deleting data.");
+				String[] totalRange = newMetadata.findTotalRange(currentNode);
+				System.out.println("totalRange: " + totalRange[0] + " " + totalRange[1]);
+				Map<String, String> pairsToDelete = fs.findKVOutOfRange(newMetadata.findTotalRange(currentNode));
+				fs.deleteKVBatch(pairsToDelete);
+			}
 		}
 		else {
 

@@ -113,7 +113,7 @@ public class FileStorage implements IFileStorage{
     public Map<String, String> get_all_pairs(){
         return hash_table;
     }
-    public Map<String, String> move_batch(String[] hash_range){
+    public Map<String, String> findKVOutOfRange(String[] hash_range){
         String begin = hash_range[0];
         String end = hash_range[1];
         String cycle_begin = "00000000000000000000000000000000";
@@ -128,8 +128,9 @@ public class FileStorage implements IFileStorage{
                 // System.out.println("    Comparator1    "+ HashKey.compareTo(begin) +"    " +HashKey.compareTo(end));
                 if (HashKey.compareTo(begin) < 0 || HashKey.compareTo(end) > 0) {
                     movedKV.put(i, hash_table.get(i));
-                    System.out.println("Transmitting pair: "+i+"    "+hash_table.get(i));
-                    logger.info("Moving key: "+i+" value: "+hash_table.get(i));
+                    // System.out.println("Transmitting pair: "+i+"    "+hash_table.get(i));
+                    // logger.info("Moving key: "+i+" value: "+hash_table.get(i));
+                    logger.info(i + ":" + hash_table.get(i) + " is out of range");
                 }
             }
         }
@@ -141,15 +142,16 @@ public class FileStorage implements IFileStorage{
                 if ((HashKey.compareTo(begin) < 0) && (HashKey.compareTo(end) > 0)) {
 
                     movedKV.put(i, hash_table.get(i));
-                    System.out.println("Transmitting pair: "+i+"    "+hash_table.get(i));
-                    logger.info("Moving key: "+i+" value: "+hash_table.get(i));
+                    // System.out.println("Transmitting pair: "+i+"    "+hash_table.get(i));
+                    // logger.info("Moving key: "+i+" value: "+hash_table.get(i));
+                    logger.info(i + ":" + hash_table.get(i) + " is out of range");
                 }
             }
         }
         
         return movedKV;
     }
-    public void move_kv_done(Map<String, String> batch){
+    public void deleteKVBatch(Map<String, String> batch){
         for(String i:batch.keySet()){
             hash_table.remove(i);
         }

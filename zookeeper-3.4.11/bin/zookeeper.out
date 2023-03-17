@@ -1,37 +1,45 @@
 SLF4J: Class path contains multiple SLF4J bindings.
-SLF4J: Found binding in [jar:file:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/build/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-SLF4J: Found binding in [jar:file:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/Users/yichengwei/Desktop/2023%20Winter%20Term/ECE419/projects/zookeeper-3.4.11/build/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/Users/yichengwei/Desktop/2023%20Winter%20Term/ECE419/projects/zookeeper-3.4.11/lib/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
 SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
-2023-03-05 18:41:00,770 [myid:] - INFO  [main:QuorumPeerConfig@136] - Reading configuration from: /Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../conf/zoo.cfg
-2023-03-05 18:41:00,776 [myid:] - INFO  [main:DatadirCleanupManager@78] - autopurge.snapRetainCount set to 3
-2023-03-05 18:41:00,776 [myid:] - INFO  [main:DatadirCleanupManager@79] - autopurge.purgeInterval set to 0
-2023-03-05 18:41:00,776 [myid:] - INFO  [main:DatadirCleanupManager@101] - Purge task is not scheduled.
-2023-03-05 18:41:00,777 [myid:] - WARN  [main:QuorumPeerMain@116] - Either no config or no quorum defined in config, running  in standalone mode
-2023-03-05 18:41:00,791 [myid:] - INFO  [main:QuorumPeerConfig@136] - Reading configuration from: /Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../conf/zoo.cfg
-2023-03-05 18:41:00,792 [myid:] - INFO  [main:ZooKeeperServerMain@98] - Starting server
-2023-03-05 18:41:00,803 [myid:] - INFO  [main:Environment@100] - Server environment:zookeeper.version=3.4.11-37e277162d567b55a07d1755f0b31c32e93c01a0, built on 11/01/2017 18:06 GMT
-2023-03-05 18:41:00,804 [myid:] - INFO  [main:Environment@100] - Server environment:host.name=localhost
-2023-03-05 18:41:00,804 [myid:] - INFO  [main:Environment@100] - Server environment:java.version=13.0.1
-2023-03-05 18:41:00,804 [myid:] - INFO  [main:Environment@100] - Server environment:java.vendor=Oracle Corporation
-2023-03-05 18:41:00,804 [myid:] - INFO  [main:Environment@100] - Server environment:java.home=/Library/Java/JavaVirtualMachines/jdk-13.0.1.jdk/Contents/Home
-2023-03-05 18:41:00,804 [myid:] - INFO  [main:Environment@100] - Server environment:java.class.path=/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/classes:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/slf4j-log4j12-1.6.1.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/slf4j-api-1.6.1.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/netty-3.10.5.Final.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/log4j-1.2.16.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/jline-0.9.94.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../build/lib/audience-annotations-0.5.0.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/slf4j-log4j12-1.6.1.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/slf4j-api-1.6.1.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/netty-3.10.5.Final.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/log4j-1.2.16.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/jline-0.9.94.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../lib/audience-annotations-0.5.0.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../zookeeper-3.4.11.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../src/java/lib/ivy-2.4.0.jar:/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin/../conf:
-2023-03-05 18:41:00,804 [myid:] - INFO  [main:Environment@100] - Server environment:java.library.path=/Users/beale/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
-2023-03-05 18:41:00,805 [myid:] - INFO  [main:Environment@100] - Server environment:java.io.tmpdir=/var/folders/8m/5192gf297sj29r3nsqzpn7jr0000gn/T/
-2023-03-05 18:41:00,805 [myid:] - INFO  [main:Environment@100] - Server environment:java.compiler=<NA>
-2023-03-05 18:41:00,806 [myid:] - INFO  [main:Environment@100] - Server environment:os.name=Mac OS X
-2023-03-05 18:41:00,806 [myid:] - INFO  [main:Environment@100] - Server environment:os.arch=x86_64
-2023-03-05 18:41:00,806 [myid:] - INFO  [main:Environment@100] - Server environment:os.version=10.16
-2023-03-05 18:41:00,806 [myid:] - INFO  [main:Environment@100] - Server environment:user.name=beale
-2023-03-05 18:41:00,807 [myid:] - INFO  [main:Environment@100] - Server environment:user.home=/Users/beale
-2023-03-05 18:41:00,807 [myid:] - INFO  [main:Environment@100] - Server environment:user.dir=/Users/beale/Desktop/ECE419/ms1-gr34/zookeeper-3.4.11/bin
-2023-03-05 18:41:00,815 [myid:] - INFO  [main:ZooKeeperServer@825] - tickTime set to 2000
-2023-03-05 18:41:00,815 [myid:] - INFO  [main:ZooKeeperServer@834] - minSessionTimeout set to -1
-2023-03-05 18:41:00,815 [myid:] - INFO  [main:ZooKeeperServer@843] - maxSessionTimeout set to -1
-2023-03-05 18:41:00,826 [myid:] - INFO  [main:ServerCnxnFactory@117] - Using org.apache.zookeeper.server.NIOServerCnxnFactory as server connection factory
-2023-03-05 18:41:00,836 [myid:] - INFO  [main:NIOServerCnxnFactory@89] - binding to port 0.0.0.0/0.0.0.0:2181
-2023-03-05 18:41:01,673 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:50739
-2023-03-05 18:41:01,685 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@931] - Client attempting to renew session 0x100243bc8960029 at /127.0.0.1:50739
-2023-03-05 18:41:01,690 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@683] - Established session 0x100243bc8960029 with negotiated timeout 4000 for client /127.0.0.1:50739
-2023-03-05 18:41:01,691 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@215] - Accepted socket connection from /127.0.0.1:50740
-2023-03-05 18:41:01,693 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@931] - Client attempting to renew session 0x1001fae8cc90001 at /127.0.0.1:50740
-2023-03-05 18:41:01,693 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@683] - Established session 0x1001fae8cc90001 with negotiated timeout 4000 for client /127.0.0.1:50740
+2023-03-17 15:26:15,383 [myid:] - INFO  [main:QuorumPeerConfig@136] - Reading configuration from: /Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../conf/zoo.cfg
+2023-03-17 15:26:15,390 [myid:] - INFO  [main:DatadirCleanupManager@78] - autopurge.snapRetainCount set to 3
+2023-03-17 15:26:15,390 [myid:] - INFO  [main:DatadirCleanupManager@79] - autopurge.purgeInterval set to 0
+2023-03-17 15:26:15,390 [myid:] - INFO  [main:DatadirCleanupManager@101] - Purge task is not scheduled.
+2023-03-17 15:26:15,392 [myid:] - WARN  [main:QuorumPeerMain@116] - Either no config or no quorum defined in config, running  in standalone mode
+2023-03-17 15:26:15,401 [myid:] - INFO  [main:QuorumPeerConfig@136] - Reading configuration from: /Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../conf/zoo.cfg
+2023-03-17 15:26:15,401 [myid:] - INFO  [main:ZooKeeperServerMain@98] - Starting server
+2023-03-17 15:26:15,408 [myid:] - INFO  [main:Environment@100] - Server environment:zookeeper.version=3.4.11-37e277162d567b55a07d1755f0b31c32e93c01a0, built on 11/01/2017 18:06 GMT
+2023-03-17 15:26:15,409 [myid:] - INFO  [main:Environment@100] - Server environment:host.name=localhost
+2023-03-17 15:26:15,409 [myid:] - INFO  [main:Environment@100] - Server environment:java.version=17.0.6
+2023-03-17 15:26:15,409 [myid:] - INFO  [main:Environment@100] - Server environment:java.vendor=Eclipse Adoptium
+2023-03-17 15:26:15,409 [myid:] - INFO  [main:Environment@100] - Server environment:java.home=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
+2023-03-17 15:26:15,409 [myid:] - INFO  [main:Environment@100] - Server environment:java.class.path=/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/classes:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/slf4j-log4j12-1.6.1.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/slf4j-api-1.6.1.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/netty-3.10.5.Final.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/log4j-1.2.16.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/jline-0.9.94.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../build/lib/audience-annotations-0.5.0.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/slf4j-log4j12-1.6.1.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/slf4j-api-1.6.1.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/netty-3.10.5.Final.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/log4j-1.2.16.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/jline-0.9.94.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../lib/audience-annotations-0.5.0.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../zookeeper-3.4.11.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../src/java/lib/ivy-2.4.0.jar:/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin/../conf:
+2023-03-17 15:26:15,409 [myid:] - INFO  [main:Environment@100] - Server environment:java.library.path=/Users/yichengwei/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
+2023-03-17 15:26:15,409 [myid:] - INFO  [main:Environment@100] - Server environment:java.io.tmpdir=/var/folders/kg/1jpwrpv90cs8jj7rnj4tffqc0000gn/T/
+2023-03-17 15:26:15,409 [myid:] - INFO  [main:Environment@100] - Server environment:java.compiler=<NA>
+2023-03-17 15:26:15,411 [myid:] - INFO  [main:Environment@100] - Server environment:os.name=Mac OS X
+2023-03-17 15:26:15,411 [myid:] - INFO  [main:Environment@100] - Server environment:os.arch=x86_64
+2023-03-17 15:26:15,411 [myid:] - INFO  [main:Environment@100] - Server environment:os.version=13.1
+2023-03-17 15:26:15,412 [myid:] - INFO  [main:Environment@100] - Server environment:user.name=yichengwei
+2023-03-17 15:26:15,412 [myid:] - INFO  [main:Environment@100] - Server environment:user.home=/Users/yichengwei
+2023-03-17 15:26:15,412 [myid:] - INFO  [main:Environment@100] - Server environment:user.dir=/Users/yichengwei/Desktop/2023 Winter Term/ECE419/projects/zookeeper-3.4.11/bin
+2023-03-17 15:26:15,422 [myid:] - INFO  [main:ZooKeeperServer@825] - tickTime set to 2000
+2023-03-17 15:26:15,422 [myid:] - INFO  [main:ZooKeeperServer@834] - minSessionTimeout set to -1
+2023-03-17 15:26:15,422 [myid:] - INFO  [main:ZooKeeperServer@843] - maxSessionTimeout set to -1
+2023-03-17 15:26:15,434 [myid:] - INFO  [main:ServerCnxnFactory@117] - Using org.apache.zookeeper.server.NIOServerCnxnFactory as server connection factory
+2023-03-17 15:26:15,440 [myid:] - INFO  [main:NIOServerCnxnFactory@89] - binding to port 0.0.0.0/0.0.0.0:2181
+2023-03-17 15:26:15,442 [myid:] - ERROR [main:ZooKeeperServerMain@66] - Unexpected exception, exiting abnormally
+java.net.BindException: Address already in use
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:555)
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.netBind(ServerSocketChannelImpl.java:337)
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:294)
+	at java.base/sun.nio.ch.ServerSocketAdaptor.bind(ServerSocketAdaptor.java:89)
+	at java.base/sun.nio.ch.ServerSocketAdaptor.bind(ServerSocketAdaptor.java:81)
+	at org.apache.zookeeper.server.NIOServerCnxnFactory.configure(NIOServerCnxnFactory.java:90)
+	at org.apache.zookeeper.server.ZooKeeperServerMain.runFromConfig(ZooKeeperServerMain.java:119)
+	at org.apache.zookeeper.server.ZooKeeperServerMain.initializeAndRun(ZooKeeperServerMain.java:89)
+	at org.apache.zookeeper.server.ZooKeeperServerMain.main(ZooKeeperServerMain.java:55)
+	at org.apache.zookeeper.server.quorum.QuorumPeerMain.initializeAndRun(QuorumPeerMain.java:119)
+	at org.apache.zookeeper.server.quorum.QuorumPeerMain.main(QuorumPeerMain.java:81)
