@@ -251,9 +251,9 @@ public class ClientConnection implements Runnable {
                 ECSNode firstSuccessor = server.getMetadataObj().findSuccessor(current);
                 ECSNode secondSuccessor = server.getMetadataObj().findSuccessor(firstSuccessor);
 
-                boolean isResponsible = server.getHostname().equals(current.getNodeHost()) || server.getPort() == current.getNodePort();
-                boolean isReplicated1 = server.getHostname().equals(firstSuccessor.getNodeHost()) || server.getPort() == firstSuccessor.getNodePort();
-                boolean isReplicated2 = server.getHostname().equals(secondSuccessor.getNodeHost()) || server.getPort() == secondSuccessor.getNodePort();
+                boolean isResponsible = server.getHostname().equals(current.getNodeHost()) && server.getPort() == current.getNodePort();
+                boolean isReplicated1 = server.getHostname().equals(firstSuccessor.getNodeHost()) && server.getPort() == firstSuccessor.getNodePort();
+                boolean isReplicated2 = server.getHostname().equals(secondSuccessor.getNodeHost()) && server.getPort() == secondSuccessor.getNodePort();
 
                 if (!(isResponsible || isReplicated1 || isReplicated2)) {
                     KVMessage.StatusType status = KVMessage.StatusType.SERVER_NOT_RESPONSIBLE;

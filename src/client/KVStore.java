@@ -98,14 +98,7 @@ public class KVStore implements KVCommInterface {
 
 		while(!requestSuccessful) {
 			//Find responsible server
-			ECSNode responsibleNode = metadata.findNode(HashKey);
-			ECSNode firstPredecessor = metadata.findPredecessor(responsibleNode);
-			ECSNode secondPredecessor = metadata.findPredecessor(firstPredecessor);
-
-			ECSNode[] nodes = {responsibleNode, firstPredecessor, secondPredecessor};
-
-			Random random = new Random();
-			ECSNode serverToContact = nodes[random.nextInt(nodes.length)];
+			ECSNode serverToContact = metadata.findNode(HashKey);
 
 			if (serverToContact.getNodeHost() != this.getServerAdress() || serverToContact.getNodePort() != this.getServerPort() ) {
 				String ip = serverToContact.getNodeHost();
@@ -157,9 +150,17 @@ public class KVStore implements KVCommInterface {
 		while(!requestSuccessful) {
 			//Find responsible server
 			ECSNode responsibleNode = metadata.findNode(HashKey);
-			if (!responsibleNode.getNodeHost().equals(this.getServerAdress()) || responsibleNode.getNodePort() != this.getServerPort()) {
-				String ip = responsibleNode.getNodeHost();
-				int port = responsibleNode.getNodePort();
+			ECSNode firstPredecessor = metadata.findPredecessor(responsibleNode);
+			ECSNode secondPredecessor = metadata.findPredecessor(firstPredecessor);
+
+			ECSNode[] nodes = {responsibleNode, firstPredecessor, secondPredecessor};
+
+			Random random = new Random();
+			ECSNode serverToContact = nodes[random.nextInt(nodes.length)];
+
+			if (!serverToContact.getNodeHost().equals(this.getServerAdress()) || serverToContact.getNodePort() != this.getServerPort()) {
+				String ip = serverToContact.getNodeHost();
+				int port = serverToContact.getNodePort();
 				this.setServerAdress(ip);
 				this.setServerPort(port);
 				this.connect();
