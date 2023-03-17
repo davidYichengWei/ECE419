@@ -13,8 +13,13 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.net.InetAddress;
 import app_kvServer.storage.FileStorage;
+import ecs.ECSNode;
+
 import org.slf4j.LoggerFactory; // Required for ZooKeeper
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
@@ -406,6 +411,9 @@ public class KVServer implements IKVServer, Runnable {
 					try {
 						String newData = new String(zk.getData(metadataPath, true, null));
 						if (event.getType() == Event.EventType.NodeDataChanged && !newData.equals(metadata)) {
+							// Process replication and reconsiliation
+							processServerChange(metadata, newData);
+
 							metadata = newData;
 							metadataObj = new Metadata(MD5Hasher.buildListOfPorts(metadata));
 							logger.info("Metadata value changed to: " + metadata);
@@ -444,6 +452,24 @@ public class KVServer implements IKVServer, Runnable {
 		}
 
 		return true;
+	}
+
+	// Process replication and reconsiliation when a server is added or removed
+	private void processServerChange(String oldMetadataString, String newMetadataString) {
+		List<String> oldServerList = new ArrayList<>(Arrays.asList(MD5Hasher.buildListOfPorts(oldMetadataString).split(" ")));
+		List<String> newServerList = new ArrayList<>(Arrays.asList(MD5Hasher.buildListOfPorts(newMetadataString).split(" ")));
+
+		Metadata oldMetadata = new Metadata(MD5Hasher.buildListOfPorts(oldMetadataString));
+		Metadata newMetadata = new Metadata(MD5Hasher.buildListOfPorts(newMetadataString));
+
+		ECSNode nodeChange = Metadata.findDifferentNode(oldServerList, newServerList);
+
+		if (newServerList.size() > oldServerList.size()) {
+
+		}
+		else {
+
+		}
 	}
 
 	/**
