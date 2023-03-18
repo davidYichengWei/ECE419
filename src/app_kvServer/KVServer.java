@@ -470,14 +470,15 @@ public class KVServer implements IKVServer, Runnable {
 		String serverChange = nodeChange.getNodeHost() + ":" + nodeChange.getNodePort();
 		logger.info("serverChange: " + serverChange);
 
+		String currentServer = serverAddress + ":" + port;
+		logger.info("currentServer: " + currentServer);
+		ECSNode currentNode = newMetadata.findNode(MD5Hasher.hash(currentServer));
+		System.out.println("Current node: " + currentNode.getNodeHost() + ":" + currentNode.getNodePort());
+
+		// Adding a server
 		if (newServerList.size() > oldServerList.size()) {
 			logger.info("A server was added: " + serverChange + ". Processing replication and reconsiliation.");
 			// 1st and 2nd predecessor of the new node need to replicate data to the new node
-			String currentServer = serverAddress + ":" + port;
-			logger.info("currentServer: " + currentServer);
-			ECSNode currentNode = newMetadata.findNode(MD5Hasher.hash(currentServer));
-			System.out.println("Current node: " + currentNode.getNodeHost() + ":" + currentNode.getNodePort());
-
 			ECSNode firstPredecessor = newMetadata.findPredecessor(nodeChange);
 			System.out.println("First predecessor of new node: " + firstPredecessor.getNodeHost() + ":" + firstPredecessor.getNodePort());
 			ECSNode secondPredecessor = newMetadata.findPredecessor(firstPredecessor);
@@ -511,8 +512,31 @@ public class KVServer implements IKVServer, Runnable {
 				fs.deleteKVBatch(pairsToDelete);
 			}
 		}
+		// Removing a server
 		else {
+			logger.info("A server was removed: " + serverChange + ". Processing replication and reconsiliation.");
+			// If the 2nd successor of the current server in the new metadata is one of the 3 successors 
+			// of the removed server in the old metadata, the current server needs to transfer its data to the 2nd successor
+			ECSNode secondSuccessor = newMetadata.findSuccessor(newMetadata.findSuccessor(currentNode));
 
+			ECSNode changeNodeSuccessor1 = oldMetadata.findSuccessor(nodeChange);
+			ECSNode changeNodeSuccessor2 = oldMetadata.findSuccessor(changeNodeSuccessor1);
+			ECSNode changeNodeSuccessor3 = oldMetadata.findSuccessor(changeNodeSuccessor2);
+
+			if (!currentNode.equals(secondSuccessor) && 
+				(secondSuccessor.equals(changeNodeSuccessor1) || secondSuccessor.equals(changeNodeSuccessor2) 
+				|| secondSuccessor.equals(changeNodeSuccessor3))) {
+
+				logger.info("Transferring data to the 2nd successor of the current server.");
+				
+				// Swap the start and end range to transfer KV pairs in the range
+				String[] range = currentNode.getNodeHashRange();
+				String tmp = range[0];
+				range[0] = range[1];
+				range[1] = tmp;
+				String secondSuccessorHostPort = secondSuccessor.getNodeHost() + ":" + secondSuccessor.getNodePort();
+				transferKV(range, secondSuccessorHostPort);
+			}
 		}
 	}
 
