@@ -113,6 +113,10 @@ public class ECSClient implements IECSClient {
         return null;
     }
 
+    public String getMetadataPath() {
+        return metadataPath;
+    }
+
     // Find the server to be added/removed from the list and its successor in the ring,
     // return a list [server, successor]
     // If the server is the first to be added or last ro be removed, return [server]
@@ -225,7 +229,7 @@ public class ECSClient implements IECSClient {
             }
 
             ECSMessage message = new ECSMessage(status, metadata, serverToContact);
-            ECSKVServerConnection connection = new ECSKVServerConnection(host, port, message);
+            ECSKVServerConnection connection = new ECSKVServerConnection(host, port, message, this);
             logger.info("Start a thread to send metadata to " + host + ":" + port);
             new Thread(connection).start();
         }

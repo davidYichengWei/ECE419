@@ -20,15 +20,17 @@ public class ECSKVServerConnection implements Runnable {
     private String host;
     private int port;
     private ECSMessage message;
+    private ECSClient ecs;
 
     private Socket socket;
     private InputStream input;
     private OutputStream output;
 
-    public ECSKVServerConnection(String host, int port, ECSMessage message) {
+    public ECSKVServerConnection(String host, int port, ECSMessage message, ECSClient ecs) {
         this.host = host;
         this.port = port;
         this.message = message;
+        this.ecs = ecs;
     }
 
     public void run() {
@@ -41,6 +43,10 @@ public class ECSKVServerConnection implements Runnable {
             logger.error("Unknown host: " + e.getMessage(), e);
         } catch (IOException e) {
             logger.error("Error connecting to server: " + e.getMessage(), e);
+
+            // Server crashed, the ECS needs to update metadata in znode
+            logger.info("Updating metadata on the ECS to begin reconsiliation");
+            ecs.setZkData(ecs.getMetadataPath(), message.getMetadata());
         }
 
         // Send the ECSMessage to the KVServer
