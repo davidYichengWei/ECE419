@@ -55,6 +55,10 @@ public class KVStore implements KVCommInterface {
 		return metadata;
 	}
 
+	public void setMetadata(Metadata metadata) {
+		this.metadata = metadata;
+	}
+
 	@Override
 	public void connect() throws UnknownHostException {
 		// TODO Auto-generated method stub
@@ -103,7 +107,6 @@ public class KVStore implements KVCommInterface {
 			if (serverToContact.getNodeHost() != this.getServerAdress() || serverToContact.getNodePort() != this.getServerPort() ) {
 				String ip = serverToContact.getNodeHost();
 				int port = serverToContact.getNodePort();
-				System.out.println("Attempting to send get request to node: " + ip + ":" + port);
 				this.setServerAdress(ip);
 				this.setServerPort(port);
 				this.connect();
@@ -150,13 +153,13 @@ public class KVStore implements KVCommInterface {
 		while(!requestSuccessful) {
 			//Find responsible server
 			ECSNode responsibleNode = metadata.findNode(HashKey);
-			ECSNode firstPredecessor = metadata.findPredecessor(responsibleNode);
-			ECSNode secondPredecessor = metadata.findPredecessor(firstPredecessor);
-
-			ECSNode[] nodes = {responsibleNode, firstPredecessor, secondPredecessor};
+			ECSNode firstSuccessor = metadata.findSuccessor(responsibleNode);
+			ECSNode secondSuccessor = metadata.findSuccessor(firstSuccessor);
+			ECSNode[] nodes = {responsibleNode, firstSuccessor, secondSuccessor};
 
 			Random random = new Random();
 			ECSNode serverToContact = nodes[random.nextInt(nodes.length)];
+			System.out.println("Attempting to send get request to node: " + serverToContact.getNodeHost() + ":" + serverToContact.getNodePort());
 
 			if (!serverToContact.getNodeHost().equals(this.getServerAdress()) || serverToContact.getNodePort() != this.getServerPort()) {
 				String ip = serverToContact.getNodeHost();

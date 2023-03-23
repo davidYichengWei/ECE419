@@ -81,7 +81,7 @@ public class Metadata implements IMetadata{
         if (node == null) {
             node = tree.first();
         }
-        System.out.println("Found node: " + node.getNodeHost() + ":" + node.getNodePort() + " with hash range " + Arrays.toString(node.getNodeHashRange()));
+        //System.out.println("Found node: " + node.getNodeHost() + ":" + node.getNodePort() + " with hash range " + Arrays.toString(node.getNodeHashRange()));
         return node;
     }
     public TreeSet<ECSNode> getTree() {
@@ -93,7 +93,7 @@ public class Metadata implements IMetadata{
         if (successor == null) {
             successor = tree.first();
         }
-        System.out.println("Found node: " + successor.getNodeHost() + ":" + successor.getNodePort() + " with hash range " + Arrays.toString(successor.getNodeHashRange()));
+        //System.out.println("Found node: " + successor.getNodeHost() + ":" + successor.getNodePort() + " with hash range " + Arrays.toString(successor.getNodeHashRange()));
         return successor;
     }
 
@@ -102,7 +102,7 @@ public class Metadata implements IMetadata{
         if (predecessor == null) {
             predecessor = tree.last();
         }
-        System.out.println("Found node: " + predecessor.getNodeHost() + ":" + predecessor.getNodePort() + " with hash range " + Arrays.toString(predecessor.getNodeHashRange()));
+        //System.out.println("Found node: " + predecessor.getNodeHost() + ":" + predecessor.getNodePort() + " with hash range " + Arrays.toString(predecessor.getNodeHashRange()));
         return predecessor;
     }
 

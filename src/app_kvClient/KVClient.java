@@ -6,7 +6,9 @@ import ecs.ECSNode;
 import logger.LogSetup;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import shared.messages.KVMessage;
 import shared.messages.Message;
+import shared.messages.Metadata;
 import shared.module.MD5Hasher;
 
 import java.io.BufferedReader;
@@ -160,6 +162,30 @@ public class KVClient implements IKVClient {
                 if (!serverUp) {
                     System.out.println("Failed to receive response from KVServer, attempting to contact other KVServer in cached metadata");
                     this.retryKVServerRequest("get", key, null);
+                }
+            } else {
+                this.printError("Invalid number of parameters!");
+            }
+        } else if (tokens[0].equals("keyrange")) {
+            if (keyValueStore == null) {
+                printError("Not connected to any server!");
+            }
+            else if (tokens.length == 1) {
+                String value;
+                try {
+                    Message response = (Message) keyValueStore.getKeyRange();
+                    if (response == null) {
+                    } else if (response.getStatus() == KVMessage.StatusType.SERVER_STOPPED) {
+                        printError("Server Stopped!");
+                    } else {
+                        value = response.getValue();
+                        String newListPorts = MD5Hasher.buildListOfPorts(value);
+                        Metadata newMetadata = new Metadata(newListPorts);
+                        keyValueStore.setMetadata(newMetadata);
+                        System.out.println("Received Response, updating metadata: {" + response.getStatus() + ", <" + value + ">}");
+                    }
+                } catch (Exception e) {
+                    printError("Error occurred in keyrange request");
                 }
             } else {
                 this.printError("Invalid number of parameters!");
