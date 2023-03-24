@@ -342,8 +342,15 @@ public class ClientConnection implements Runnable {
                     sendClientMessage(new Message(
                         msg.getKey(), msg.getValue(),
                         status));
-                    server.send_one_kv(firstSuccessor.getNodeHost()+":"+firstSuccessor.getNodePort(), msg.getKey(), msg.getValue());
-                    server.send_one_kv(secondSuccessor.getNodeHost()+":"+secondSuccessor.getNodePort(), msg.getKey(), msg.getValue());
+                    if(!isReplicated1)
+                    {
+                        server.send_one_kv(firstSuccessor.getNodeHost()+":"+firstSuccessor.getNodePort(), msg.getKey(), msg.getValue());
+                    }
+                    if(!isReplicated2)
+                    {
+                        server.send_one_kv(secondSuccessor.getNodeHost()+":"+secondSuccessor.getNodePort(), msg.getKey(), msg.getValue());
+                    }
+                    
 
                     
                 }
