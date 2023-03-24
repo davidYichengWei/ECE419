@@ -7,7 +7,9 @@ public class ServerMessage implements Serializable {
 		SEND_KV, 	/* KVServer transfer data to serverToContact */
 		SEND_KV_ACK,		/* reply after receiving data */
         SET_RUNNING,
-        SET_RUNNING_ACK
+        SET_RUNNING_ACK,
+        REPLICATE_KV_ACK,
+        REPLICATE_KV
 	}
     private String KVPairs;
     private ServerMessageStatus status;

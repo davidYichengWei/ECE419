@@ -139,6 +139,16 @@ public class ClientConnection implements Runnable {
             sendServerMessage(reply);
             this.isOpen=false;
         }
+        else if(status==ServerMessage.ServerMessageStatus.REPLICATE_KV){
+            Map<String, String> pairs = msg.getPairs();
+            for(String i:pairs.keySet()){
+                System.out.println(i+"--------------------------------"+pairs.get(i));
+
+            }
+            this.server.receiveKV(pairs);
+            ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.REPLICATE_KV_ACK, "");
+            sendServerMessage(reply);
+        }
 
 
     }
@@ -284,6 +294,12 @@ public class ClientConnection implements Runnable {
                 String keyHash = MD5Hasher.hash(msg.getKey());
                 logger.info("keyHash is " + keyHash);
                 ECSNode current = server.getMetadataObj().findNode(keyHash);
+                ECSNode firstSuccessor = server.getMetadataObj().findSuccessor(current);
+                ECSNode secondSuccessor = server.getMetadataObj().findSuccessor(firstSuccessor);
+
+                boolean isResponsible = server.getHostname().equals(current.getNodeHost()) && server.getPort() == current.getNodePort();
+                boolean isReplicated1 = server.getHostname().equals(firstSuccessor.getNodeHost()) && server.getPort() == firstSuccessor.getNodePort();
+                boolean isReplicated2 = server.getHostname().equals(secondSuccessor.getNodeHost()) && server.getPort() == secondSuccessor.getNodePort();
                 if (!server.getHostname().equals(current.getNodeHost()) || server.getPort() != current.getNodePort()) {
                     KVMessage.StatusType status = KVMessage.StatusType.SERVER_NOT_RESPONSIBLE;
                     sendClientMessage(new Message(null, null, status));
@@ -326,6 +342,10 @@ public class ClientConnection implements Runnable {
                     sendClientMessage(new Message(
                         msg.getKey(), msg.getValue(),
                         status));
+                    server.send_one_kv(firstSuccessor.getNodeHost()+":"+firstSuccessor.getNodePort(), msg.getKey(), msg.getValue());
+                    server.send_one_kv(secondSuccessor.getNodeHost()+":"+secondSuccessor.getNodePort(), msg.getKey(), msg.getValue());
+
+                    
                 }
                 catch (Exception ex) {
                     KVMessage.StatusType errorStatus = KVMessage.StatusType.PUT_ERROR;
