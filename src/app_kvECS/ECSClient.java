@@ -152,12 +152,13 @@ public class ECSClient implements IECSClient {
         // Find successor of the server to be added/removed
         String listOfHostPorts = "";
         if (oldList.size() < newList.size()) {
-            listOfHostPorts = String.join(" ", oldList);
-        } else {
             listOfHostPorts = String.join(" ", newList);
+        } else {
+            listOfHostPorts = String.join(" ", oldList);
         }
         Metadata metadata = new Metadata(listOfHostPorts);
-        ECSNode successorNode = metadata.findNode(result.get(0));
+        ECSNode currentNode = metadata.findNode(MD5Hasher.hash(result.get(0)));
+        ECSNode successorNode = metadata.findSuccessor(currentNode);
         if (successorNode != null) {
             String successor = successorNode.getNodeHost() + ":" + successorNode.getNodePort();
             result.add(successor);

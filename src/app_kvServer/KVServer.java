@@ -528,8 +528,8 @@ public class KVServer implements IKVServer, Runnable {
 
 			// The 3 successors of the new node need to reconsiliate data
 			ECSNode firstSuccessor = newMetadata.findSuccessor(nodeChange);
-			ECSNode secondSuccessor = newMetadata.findSuccessor(firstPredecessor);
-			ECSNode thirdSuccessor = newMetadata.findSuccessor(secondPredecessor);
+			ECSNode secondSuccessor = newMetadata.findSuccessor(firstSuccessor);
+			ECSNode thirdSuccessor = newMetadata.findSuccessor(secondSuccessor);
 
 			if (currentNode.equals(firstSuccessor) || currentNode.equals(secondSuccessor) || currentNode.equals(thirdSuccessor)) {
 				// Reconsiliate data, delete data out of the combined range of itself and its 2 predecessors
