@@ -1,6 +1,8 @@
 package app_kvServer.storage;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 import logger.LogSetup;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -24,7 +26,9 @@ public class FileStorage implements IFileStorage{
         initialize();
     }
     private void initialize() throws Exception{
-        hash_table=new HashMap<String,String>();
+        // To avoid ConcurrentModificationException, which occurs when a collection 
+        // is modified while it is being iterated over.
+        hash_table=new ConcurrentHashMap<String,String>(); 
         System.out.println("file exists");
         // if(this.db_file ==null){
             File f1 = new File(this.file_path);

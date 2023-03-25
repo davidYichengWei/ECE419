@@ -552,6 +552,12 @@ public class KVServer implements IKVServer, Runnable {
 			ECSNode changeNodeSuccessor2 = oldMetadata.findSuccessor(changeNodeSuccessor1);
 			ECSNode changeNodeSuccessor3 = oldMetadata.findSuccessor(changeNodeSuccessor2);
 
+			System.out.println("Current server is " + currentServer);
+			System.out.println("2nd successor of current server in the new metadata is " + secondSuccessor.getNodeHost() + ":" + secondSuccessor.getNodePort());
+			System.out.println("1st successor of removed server in the old metadata is " + changeNodeSuccessor1.getNodeHost() + ":" + changeNodeSuccessor1.getNodePort());
+			System.out.println("2nd successor of removed server in the old metadata is " + changeNodeSuccessor2.getNodeHost() + ":" + changeNodeSuccessor2.getNodePort());
+			System.out.println("3rd successor of removed server in the old metadata is " + changeNodeSuccessor3.getNodeHost() + ":" + changeNodeSuccessor3.getNodePort());
+
 			if (!currentNode.equals(secondSuccessor) && 
 				(secondSuccessor.equals(changeNodeSuccessor1) || secondSuccessor.equals(changeNodeSuccessor2) 
 				|| secondSuccessor.equals(changeNodeSuccessor3))) {
