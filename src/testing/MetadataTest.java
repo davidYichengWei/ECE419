@@ -75,14 +75,36 @@ public class MetadataTest extends TestCase {
         ECSNode secondSuccessor = metadata.findSuccessor(firstSuccessor);
         ECSNode thirdSuccessor = metadata.findSuccessor(secondSuccessor);
 
-        //System.out.println("Responsible node is: " + responsibleNode.getNodeHost() + ":" + responsibleNode.getNodePort());
-        //System.out.println("First successor is: " + firstSuccessor.getNodeHost() + ":" + firstSuccessor.getNodePort());
-        //System.out.println("Second successor is: " + secondSuccessor.getNodeHost() + ":" + secondSuccessor.getNodePort());
-        //System.out.println("Third successor is: " + thirdSuccessor.getNodeHost() + ":" + thirdSuccessor.getNodePort());
+//        System.out.println("Responsible node is: " + responsibleNode.getNodeHost() + ":" + responsibleNode.getNodePort());
+//        System.out.println("First successor is: " + firstSuccessor.getNodeHost() + ":" + firstSuccessor.getNodePort());
+//        System.out.println("Second successor is: " + secondSuccessor.getNodeHost() + ":" + secondSuccessor.getNodePort());
+//        System.out.println("Third successor is: " + thirdSuccessor.getNodeHost() + ":" + thirdSuccessor.getNodePort());
 
         assertEquals("localhost:8084", responsibleNode.getNodeHost() + ":" + responsibleNode.getNodePort());
         assertFalse("localhost:8084".equals(firstSuccessor.getNodeHost() + ":" + firstSuccessor.getNodePort()));
         assertFalse("localhost:8084".equals(secondSuccessor.getNodeHost() + ":" + secondSuccessor.getNodePort()));
         assertFalse("localhost:8084".equals(thirdSuccessor.getNodeHost() + ":" + thirdSuccessor.getNodePort()));
+    }
+
+    public void testFindPredecessor() {
+        Metadata metadata = new Metadata("localhost:8081 localhost:8082 localhost:8083");
+        ECSNode newNode = new ECSNode("node4", "localhost", 8084, null);
+        metadata.addNode(newNode);
+
+        String HashKey = MD5Hasher.hash("localhost:8084");
+        ECSNode responsibleNode = metadata.findNode(HashKey);
+        ECSNode firstPredecessor = metadata.findPredecessor(responsibleNode);
+        ECSNode secondPredecessor = metadata.findPredecessor(firstPredecessor);
+        ECSNode thirdPredecessor = metadata.findPredecessor(secondPredecessor);
+
+//        System.out.println("Responsible node is: " + responsibleNode.getNodeHost() + ":" + responsibleNode.getNodePort());
+//        System.out.println("First predecessor is: " + firstPredecessor.getNodeHost() + ":" + firstPredecessor.getNodePort());
+//        System.out.println("Second predecessor is: " + secondPredecessor.getNodeHost() + ":" + secondPredecessor.getNodePort());
+//        System.out.println("Third predecessor is: " + thirdPredecessor.getNodeHost() + ":" + thirdPredecessor.getNodePort());
+
+        assertEquals("localhost:8084", responsibleNode.getNodeHost() + ":" + responsibleNode.getNodePort());
+        assertFalse("localhost:8084".equals(firstPredecessor.getNodeHost() + ":" + firstPredecessor.getNodePort()));
+        assertFalse("localhost:8084".equals(secondPredecessor.getNodeHost() + ":" + secondPredecessor.getNodePort()));
+        assertFalse("localhost:8084".equals(thirdPredecessor.getNodeHost() + ":" + thirdPredecessor.getNodePort()));
     }
 }
