@@ -306,15 +306,15 @@ public class KVServer implements IKVServer, Runnable {
         }
 
 	}
-	public void send_one_kv(String server, String key, String value){
+	public void send_one_kv(String host, int port, String key, String value){
 		Map<String, String> move_map = new HashMap<String, String>();
 		move_map.put(key, value);
 		String kvPairs = convert_map_string(move_map);
-		String[] dest = server.split(":");
+		// String[] dest = server.split(":");
 		try {
-			Socket socket = new Socket(dest[0], Integer.parseInt(dest[1]));
-			System.out.println(dest[0]);
-			System.out.println(dest[1]);
+			Socket socket = new Socket(host, port);
+			System.out.println(host);
+			System.out.println(port);
 			this.status = ServerStatus.SERVER_WRITE_LOCK;
 			OutputStream output = socket.getOutputStream();
 			InputStream input = socket.getInputStream();
@@ -327,10 +327,10 @@ public class KVServer implements IKVServer, Runnable {
 			ServerMessage reply = receiveMessage(input);
 			
 			if(reply.getServerStatus() == ServerMessageStatus.REPLICATE_KV_ACK){
-
+				// socket.close();
 				logger.info("REPLICATED PAIR");
 			}
-			
+			this.status = ServerStatus.RUNNING;
         } catch (IOException e) {
             logger.error("Error sending Server message: " + e.getMessage(), e);
         }
