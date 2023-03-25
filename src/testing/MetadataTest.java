@@ -6,6 +6,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import shared.messages.KVMessage;
 import shared.messages.Metadata;
+import shared.module.MD5Hasher;
 
 import java.util.Comparator;
 import java.util.TreeSet;
@@ -62,5 +63,26 @@ public class MetadataTest extends TestCase {
             }
         });
         assertEquals(expectedTree, metadata.getTree());
+    }
+    public void testFindSuccessor() {
+        Metadata metadata = new Metadata("localhost:8081 localhost:8082 localhost:8083");
+        ECSNode newNode = new ECSNode("node4", "localhost", 8084, null);
+        metadata.addNode(newNode);
+
+        String HashKey = MD5Hasher.hash("localhost:8084");
+        ECSNode responsibleNode = metadata.findNode(HashKey);
+        ECSNode firstSuccessor = metadata.findSuccessor(responsibleNode);
+        ECSNode secondSuccessor = metadata.findSuccessor(firstSuccessor);
+        ECSNode thirdSuccessor = metadata.findSuccessor(secondSuccessor);
+
+        //System.out.println("Responsible node is: " + responsibleNode.getNodeHost() + ":" + responsibleNode.getNodePort());
+        //System.out.println("First successor is: " + firstSuccessor.getNodeHost() + ":" + firstSuccessor.getNodePort());
+        //System.out.println("Second successor is: " + secondSuccessor.getNodeHost() + ":" + secondSuccessor.getNodePort());
+        //System.out.println("Third successor is: " + thirdSuccessor.getNodeHost() + ":" + thirdSuccessor.getNodePort());
+
+        assertEquals("localhost:8084", responsibleNode.getNodeHost() + ":" + responsibleNode.getNodePort());
+        assertFalse("localhost:8084".equals(firstSuccessor.getNodeHost() + ":" + firstSuccessor.getNodePort()));
+        assertFalse("localhost:8084".equals(secondSuccessor.getNodeHost() + ":" + secondSuccessor.getNodePort()));
+        assertFalse("localhost:8084".equals(thirdSuccessor.getNodeHost() + ":" + thirdSuccessor.getNodePort()));
     }
 }
