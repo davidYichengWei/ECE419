@@ -169,7 +169,12 @@ public class FileStorage implements IFileStorage{
     }
     public void receive_pairs(Map<String, String> batch){
         for(String i:batch.keySet()){
-            hash_table.put(i, batch.get(i));
+            if(batch.get(i)!=null){
+                hash_table.put(i, batch.get(i));
+            }
+            else{
+                hash_table.remove(i);
+            }
             // System.out.println(i+"    RRRRRRRRRRRRRRRRRRRRRRRRR receiving pairs      "+hash_table.get(i));
         }
         storeKVInFile();
