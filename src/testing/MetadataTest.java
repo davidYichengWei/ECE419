@@ -107,4 +107,42 @@ public class MetadataTest extends TestCase {
         assertFalse("localhost:8084".equals(secondPredecessor.getNodeHost() + ":" + secondPredecessor.getNodePort()));
         assertFalse("localhost:8084".equals(thirdPredecessor.getNodeHost() + ":" + thirdPredecessor.getNodePort()));
     }
+
+    public void testFindTotalRange() {
+        Metadata metadata = new Metadata("localhost:8081 localhost:8082 localhost:8083");
+        ECSNode newNode = new ECSNode("node4", "localhost", 8084, null);
+        metadata.addNode(newNode);
+
+        String HashKey = MD5Hasher.hash("localhost:8084");
+        ECSNode node = metadata.findNode(HashKey);
+
+        String[] totalRange = metadata.findTotalRange(node);
+
+        ECSNode firstPredecessor = metadata.findPredecessor(node);
+        ECSNode secondPredecessor = metadata.findPredecessor(firstPredecessor);
+        String[] secondPredecessorRange = secondPredecessor.getNodeHashRange();
+
+        assertEquals(secondPredecessorRange[0], totalRange[0]);
+        assertEquals(HashKey, totalRange[1]);
+    }
+
+    public void testFindReplicatedRange() {
+        Metadata metadata = new Metadata("localhost:8081 localhost:8082 localhost:8083");
+        ECSNode newNode = new ECSNode("node4", "localhost", 8084, null);
+        metadata.addNode(newNode);
+
+        String HashKey = MD5Hasher.hash("localhost:8084");
+        ECSNode node = metadata.findNode(HashKey);
+
+        String[] replicatedRange = metadata.findReplicatedRange(node);
+
+        ECSNode firstPredecessor = metadata.findPredecessor(node);
+        ECSNode secondPredecessor = metadata.findPredecessor(firstPredecessor);
+        String[] secondPredecessorRange = secondPredecessor.getNodeHashRange();
+        String[] firstPredecessorRange = firstPredecessor.getNodeHashRange();
+
+        assertEquals(secondPredecessorRange[0], replicatedRange[0]);
+        assertEquals(firstPredecessorRange[1], replicatedRange[1]);
+    }
+
 }
