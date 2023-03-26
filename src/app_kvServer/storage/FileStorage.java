@@ -169,7 +169,7 @@ public class FileStorage implements IFileStorage{
     }
     public void receive_pairs(Map<String, String> batch){
         for(String i:batch.keySet()){
-            if(batch.get(i)!=null){
+            if(!batch.get(i).equals("null")){
                 hash_table.put(i, batch.get(i));
             }
             else{

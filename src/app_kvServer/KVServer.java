@@ -621,11 +621,14 @@ public class KVServer implements IKVServer, Runnable {
 	@Override
     public void kill(){
 		// TODO Auto-generated method stub
+		System.out.println("Halting the program without triggering the shutdown hook...");
+        Runtime.getRuntime().halt(0);
 	}
 
 	@Override
     public void close(){
 		// TODO Auto-generated method stub
+		System.exit(0);
 	}
 
 	/**
