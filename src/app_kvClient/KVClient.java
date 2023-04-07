@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import shared.messages.KVMessage;
 import shared.messages.Message;
 import shared.messages.Metadata;
+import shared.messages.TransactionMessage;
 import shared.module.MD5Hasher;
 
 import java.io.BufferedReader;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KVClient implements IKVClient {
 
@@ -202,9 +205,52 @@ public class KVClient implements IKVClient {
             } else {
                 this.printError("Invalid number of parameters!");
             }
+        } else if (tokens[0].equals("tput")){
+            System.out.println("Please enter key value pairs, type <tput confirm> to send request:");
+            this.getInTransactionPut();
         } else {
             printError("Unknown command");
             printHelp();
+        }
+    }
+
+    public void getInTransactionPut() {
+        boolean done = false;
+        boolean validInput = true;
+        List<String[]> keyValuePairs = new ArrayList<>();
+        while(!done) {
+            stdin = new BufferedReader(new InputStreamReader(System.in));
+            System.out.print(PROMPT);
+
+            try {
+                String cmdLine = stdin.readLine();
+                String[] tokens = cmdLine.split("\\s+");
+                if (tokens.length < 2) {
+                    validInput = false;
+                    done = true;
+                    this.printError("Invalid number of arguments please print key value pairs one at a time. Transaction Canceled");
+                }
+                if (tokens[0].equals("tput") && tokens[1].equals("confirm")) {
+                    done = true;
+                }
+                else {
+                    String key = tokens[1];
+                    String value = cmdLine.substring(cmdLine.indexOf(key) + key.length() + 1);
+                    String[] pair = new String[]{key, value};
+                    keyValuePairs.add(pair);
+                }
+            } catch (IOException e) {
+                stop = true;
+                printError("CLI does not respond - Application terminated ");
+            }
+        }
+        if (validInput) {
+            try {
+                TransactionMessage response = keyValueStore.putTransaction(keyValuePairs);
+                System.out.println("Received Response: " + response.getStatus().toString());
+            } catch (Exception e) {
+                printError("Error occurred in transaction request");
+            }
         }
     }
 

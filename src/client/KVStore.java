@@ -1,14 +1,13 @@
 package client;
 
 import ecs.ECSNode;
-import shared.messages.KVMessage;
-import shared.messages.Message;
-import shared.messages.Metadata;
+import shared.messages.*;
 import shared.module.ClientCommunication;
 import shared.module.MD5Hasher;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Random;
 
 public class KVStore implements KVCommInterface {
@@ -134,6 +133,21 @@ public class KVStore implements KVCommInterface {
 		}
 
 
+		return response;
+	}
+
+	public TransactionMessage putTransaction(List<String[]> keyValuePairs) throws Exception {
+		if (manuallyDisconnected) {
+			throw new Exception("Client is manually disconnected");
+		}
+		TransactionMessage putTransactionRequest = new TransactionMessage(ITransactionMessage.TStatusType.TRANSACTION_PUT);
+		for (String[] keyValuePair:keyValuePairs) {
+			String key = keyValuePair[0];
+			String value = keyValuePair[1];
+			putTransactionRequest.addKeyValuePair(key,value);
+		}
+		this.clientCommunicationModule.sendTransactionMessage(putTransactionRequest);
+		TransactionMessage response = this.clientCommunicationModule.receiveTransactionMessage();
 		return response;
 	}
 
