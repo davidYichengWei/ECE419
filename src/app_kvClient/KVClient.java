@@ -206,7 +206,7 @@ public class KVClient implements IKVClient {
                 this.printError("Invalid number of parameters!");
             }
         } else if (tokens[0].equals("tput")){
-            System.out.println("Please enter key value pairs, type <tput confirm> to send request:");
+            System.out.println("Please enter key value pairs, type <tput confirm> to send request, <tput cancel> to cancel:");
             this.getInTransactionPut();
         } else {
             printError("Unknown command");
@@ -229,12 +229,19 @@ public class KVClient implements IKVClient {
                     validInput = false;
                     done = true;
                     this.printError("Invalid number of arguments please print key value pairs one at a time. Transaction Canceled");
+                    break;
+                }
+                if (tokens[0].equals("tput") && tokens[1].equals("cancel")) {
+                    validInput = false;
+                    done = true;
+                    System.out.println("Transaction cancelled");
+                    break;
                 }
                 if (tokens[0].equals("tput") && tokens[1].equals("confirm")) {
                     done = true;
                 }
                 else {
-                    String key = tokens[1];
+                    String key = tokens[0];
                     String value = cmdLine.substring(cmdLine.indexOf(key) + key.length() + 1);
                     String[] pair = new String[]{key, value};
                     keyValuePairs.add(pair);
