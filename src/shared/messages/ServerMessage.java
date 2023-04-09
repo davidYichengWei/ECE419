@@ -9,7 +9,15 @@ public class ServerMessage implements Serializable {
         SET_RUNNING,
         SET_RUNNING_ACK,
         REPLICATE_KV_ACK,
-        REPLICATE_KV
+        REPLICATE_KV,
+        TRANSACTION_GET,     /* For the coordinator to get initial values for keys */
+        TRANSACTION_GET_ACK, /* For the server to reply the coordinator with kv pairs */
+        TRANSACTION_SEND_KV, /* For the coordinator to send kv pairs to corresponding servers */
+        TRANSACTION_ACK,     /* For server to notify the coordinator that it's done processing the kv pairs */
+        TRANSACTION_ABORT,
+        TRANSACTION_ABORT_ACK,
+        TRANSACTION_COMMIT,
+        TRANSACTION_COMMIT_ACK
 	}
     private String KVPairs;
     private ServerMessageStatus status;

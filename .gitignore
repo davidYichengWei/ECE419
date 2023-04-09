@@ -34,3 +34,5 @@ hs_err_pid*
 db.*
 localhost*.properties
 *.properties
+
+zookeeper.out

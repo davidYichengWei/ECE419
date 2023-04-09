@@ -3,8 +3,14 @@ package app_kvServer;
 import java.io.*;
 import java.net.Socket;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import ecs.ECSNode;
 import org.apache.log4j.*;
+import java.net.UnknownHostException;
 
 import app_kvServer.IKVServer.ServerStatus;
 import shared.messages.KVMessage;
@@ -14,6 +20,8 @@ import shared.messages.ECSMessage;
 import shared.module.MD5Hasher;
 import shared.messages.ServerMessage;
 import shared.messages.ServerMessage.ServerMessageStatus;
+import shared.messages.ITransactionMessage;
+import shared.messages.TransactionMessage;
 
 /**
  * Represents a connection end point for a particular client that is
@@ -28,6 +36,7 @@ public class ClientConnection implements Runnable {
 		Client_Message, 	/* Request message from KVStore */
 		ECS_Message, 		/* Message from ECS to initiate data transfer */
         Server_Message, 	/* Data transfer message from KVServer */
+        Transaction_Message,/* Message from KVStore to initiate transaction */
         Unknown             /* Unknown message type, error */
 	}
 
@@ -65,7 +74,7 @@ public class ClientConnection implements Runnable {
 
             while (isOpen) {
                 try {
-                    byte[] msgBytes = receiveBytes();
+                    byte[] msgBytes = receiveBytes(input);
                     MessageType msgType = getMessageType(msgBytes);
 
                     if (msgType == MessageType.Client_Message) {
@@ -80,6 +89,10 @@ public class ClientConnection implements Runnable {
                         logger.info("Message type: Server_Message");
                         handleServerMessage(new ServerMessage(msgBytes));
                     } 
+                    else if (msgType == MessageType.Transaction_Message) {
+                        logger.info("Message type: Transaction_Message");
+                        handleTransactionMessage(new TransactionMessage(msgBytes));
+                    }
                     else {
                         logger.error("Unknown message type received");
                         sendFailedMessage("FAILED Message format unknown!");
@@ -129,14 +142,14 @@ public class ClientConnection implements Runnable {
             }
             this.server.receiveKV(pairs);
             ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.SEND_KV_ACK, "");
-            sendServerMessage(reply);
+            sendServerMessage(reply, output);
             
         }
         
         else if (status == ServerMessage.ServerMessageStatus.SET_RUNNING){
             this.server.setStatus(ServerStatus.RUNNING);
             ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.SET_RUNNING_ACK, "");
-            sendServerMessage(reply);
+            sendServerMessage(reply, output);
             this.isOpen=false;
         }
         else if(status==ServerMessage.ServerMessageStatus.REPLICATE_KV){
@@ -147,7 +160,7 @@ public class ClientConnection implements Runnable {
             }
             this.server.receiveKV(pairs);
             ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.REPLICATE_KV_ACK, "");
-            sendServerMessage(reply);
+            sendServerMessage(reply, output);
         }
 
 
@@ -368,28 +381,286 @@ public class ClientConnection implements Runnable {
         }
     }
 
+    // Handle client transaction message
+    public void handleTransactionMessage(TransactionMessage msg) {
+        assert (msg.getStatus() == ITransactionMessage.TStatusType.TRANSACTION_PUT);
+
+        // Build a map from kvPairsList, whose key is the server and value is a list of kvPairs handled by that server
+        List<String[]> kvPairsList = msg.getKeyValuePairs();
+        Map<String, List<String[]>> serverKVPairsMap = new HashMap<String, List<String[]>>();
+        Metadata metadata = server.getMetadataObj();
+
+        System.out.println("Building serverKVPairsMap");
+        for (String[] kvPair : kvPairsList) {
+            String key = kvPair[0];
+            String value = kvPair[1];
+
+            String keyHash = MD5Hasher.hash(key);
+            ECSNode responsibleNode = metadata.findNode(keyHash);
+            String hostPort = responsibleNode.getNodeHost() + ":" + responsibleNode.getNodePort();
+            if (serverKVPairsMap.containsKey(hostPort)) {
+                serverKVPairsMap.get(hostPort).add(kvPair);
+            }
+            else {
+                List<String[]> kvPairs = new ArrayList<String[]>();
+                kvPairs.add(kvPair);
+                serverKVPairsMap.put(hostPort, kvPairs);
+            }
+        }
+
+        // Print out serverKVPairsMap to check values
+        for (String hostPort : serverKVPairsMap.keySet()) {
+            System.out.println("Server: " + hostPort);
+            List<String[]> kvPairs = serverKVPairsMap.get(hostPort);
+            for (String[] kvPair : kvPairs) {
+                System.out.println("key: " + kvPair[0] + ", value: " + kvPair[1]);
+            }
+        }
+
+        // TRANSACTION_GET: get the initial values of keys in the map from the corresponding servers 
+        // at the beginning of transaction
+        // Server should reply with TRANSACTION_GET_ACK and kvPairs
+        logger.info("[Transaction] Getting initial values of keys");
+        Map<String, Map<String, String>> initialServerKVPairsMap = 
+            transactionCommunication(serverKVPairsMap, ServerMessage.ServerMessageStatus.TRANSACTION_GET);
+
+        // TRANSACTION_SEND_KV: send kv pairs in the map to the corresponding servers
+        // Server should reply with TRANSACTION_ACK
+        logger.info("[Transaction] Sending put requests to servers");
+        transactionCommunication(serverKVPairsMap, ServerMessage.ServerMessageStatus.TRANSACTION_SEND_KV);
+
+        // Get the values again and check if they have been changed by other clients
+        logger.info("[Transaction] Getting values of keys again to check if they have been changed");
+        Map<String, Map<String, String>> finalServerKVPairsMap = 
+            transactionCommunication(serverKVPairsMap, ServerMessage.ServerMessageStatus.TRANSACTION_GET);
+
+        // Check if the values have been changed
+        boolean changed = false;
+        for (String hostPort : finalServerKVPairsMap.keySet()) {
+            Map<String, String> initialKVPairs = initialServerKVPairsMap.get(hostPort);
+            Map<String, String> finalKVPairs = finalServerKVPairsMap.get(hostPort);
+            for (String key : initialKVPairs.keySet()) {
+                if (!initialKVPairs.get(key).equals(finalKVPairs.get(key))) {
+                    changed = true;
+                    break;
+                }
+            }
+        }
+
+        if (changed) {
+            // Abort transaction and reply with TRANSACTION_PUT_FAILURE
+            logger.info("[Transaction] Values have been changed by other clients, ABORT");
+            transactionCommunication(serverKVPairsMap, ServerMessage.ServerMessageStatus.TRANSACTION_ABORT);
+            sendTransactionMessage(new TransactionMessage(ITransactionMessage.TStatusType.TRANSACTION_PUT_FAILURE));
+        }
+        else {
+            // Commit transaction and reply with TRANSACTION_PUT_SUCCESS
+            logger.info("[Transaction] Values have not been changed, COMMIT");
+            transactionCommunication(serverKVPairsMap, ServerMessage.ServerMessageStatus.TRANSACTION_COMMIT);
+            sendTransactionMessage(new TransactionMessage(ITransactionMessage.TStatusType.TRANSACTION_PUT_SUCCESS));
+        }
+    }
+
+    // Send requests to servers in serverKVPairsMap and receive responses
+    // status: TRANSACTION_GET, TRANSACTION_SEND_KV, TRANSACTION_COMMIT, TRANSACTION_ABORT
+    // Use multi-threading to send requests concurrently
+    // Return: for TRANSACTION_GET, return a map where key is the hostPort of the server 
+    // and value is a map of key-value pairs; for other statuses, return null
+    public Map<String, Map<String, String>> transactionCommunication
+        (Map<String, List<String[]>> serverKVPairsMap, final ServerMessage.ServerMessageStatus status) {
+        // For TRANSACTION_GET: get the current values of keys in the map from the corresponding servers
+        final Map<String, Map<String, String>>[] currentServerKVPairsMap = 
+            new ConcurrentHashMap[]{new ConcurrentHashMap<String, Map<String, String>>()}; // Use array to make it final
+        // For counting the number of replies received
+        final AtomicInteger[] sharedCounter = {new AtomicInteger(0)}; // Use array to make it final
+
+        for (final String hostPort : serverKVPairsMap.keySet()) {
+            String[] hostPortSplit = hostPort.split(":");
+            final String host = hostPortSplit[0];
+            final int port = Integer.parseInt(hostPortSplit[1]);
+            final List<String[]> kvPairs = serverKVPairsMap.get(hostPort);
+            
+            if (!host.equals(server.getHostname()) || port != server.getPort()) {
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Build a socket connection to KVServer at host:port
+                        Socket transactionSocket = null;
+                        OutputStream transactionOutput = null;
+                        InputStream transactionInput = null;
+                        try {
+                            transactionSocket = new Socket(host, port);
+                            transactionOutput = transactionSocket.getOutputStream();
+                            transactionInput = transactionSocket.getInputStream();
+                        } catch (UnknownHostException e) {
+                            logger.error("Unknown host: " + e.getMessage(), e);
+                        } catch (IOException e) {
+                            logger.error("Error connecting to server: " + e.getMessage(), e);
+                        }
+
+                        // Build ServerMessage
+                        String kvDelimiter = ";;;;;";
+                        String kvPairDelimiter = "&&&&&";
+                        String combinedKVPairs = "";
+                        for (String[] kvPair : kvPairs) {
+                            String key = kvPair[0];
+                            String value = kvPair[1];
+                            combinedKVPairs += key + kvPairDelimiter + value + kvDelimiter;
+                        }
+
+                        ServerMessage serverMsg = new ServerMessage(
+                            status,
+                            combinedKVPairs);
+
+                        // Send ServerMessage to KVServer at host:port
+                        sendServerMessage(serverMsg, transactionOutput);
+
+                        // Receive ServerMessage reply
+                        byte[] reply;
+                        try {
+                            reply = receiveBytes(transactionInput);
+                        }
+                        catch (IOException e) {
+                            logger.error("Error receiving reply from server", e);
+                            return;
+                        }
+                        catch (ClassNotFoundException e) {
+                            logger.error("Error receiving reply from server", e);
+                            return;
+                        }
+                        
+                        ServerMessage replyMsg;
+                        try {
+                            replyMsg = new ServerMessage(reply);
+                        } catch (IllegalArgumentException e) {
+                            logger.error("Error parsing ServerMessage", e);
+                            return;
+                        }
+
+                        if (status == ServerMessage.ServerMessageStatus.TRANSACTION_GET) {
+                            assert (replyMsg.getServerStatus() == ServerMessage.ServerMessageStatus.TRANSACTION_GET_ACK);
+                            // Store the map of key-value pairs in currentServerKVPairsMap
+                            Map <String, String> replyKVPairs = replyMsg.getPairs();
+                            currentServerKVPairsMap[0].put(hostPort, replyKVPairs);
+                        }
+                        else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_SEND_KV) {
+                            assert (replyMsg.getServerStatus() == ServerMessage.ServerMessageStatus.TRANSACTION_ACK);
+                        }
+                        else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_COMMIT) {
+                            assert (replyMsg.getServerStatus() == ServerMessage.ServerMessageStatus.TRANSACTION_COMMIT_ACK);
+                        }
+                        else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_ABORT) {
+                            assert (replyMsg.getServerStatus() == ServerMessage.ServerMessageStatus.TRANSACTION_ABORT_ACK);
+                        }
+                        
+                        sharedCounter[0].incrementAndGet(); // Increament the counter by 1 to indicate that this thread is done
+
+                        // Close the socket connection
+                        try {
+                            transactionSocket.close();
+                        } catch (IOException e) {
+                            logger.error("Error closing socket", e);
+                        }
+                    }
+                });
+
+                thread.start();
+            }
+            else { // The server is the coordinator itself
+                
+                if (status == ServerMessage.ServerMessageStatus.TRANSACTION_GET) {
+                    // Get values for kvPairs from the current server
+                    Map<String, String> currentServerPairs = new ConcurrentHashMap<String, String>();
+                    for (String[] kvPair : kvPairs) {
+                        String key = kvPair[0];
+                        String value = kvPair[1];
+                        String currentValue = null;
+                        try {
+                            currentValue = server.getKV(key);
+                        }
+                        catch (Exception e) {
+                            logger.error("Error getting value for key " + key, e);
+                        }
+                        
+                        if (currentValue == null) {
+                            currentValue = "null"; // Use the String "null" to represent null values
+                        }
+                        currentServerPairs.put(key, currentValue);
+                    }
+                    // Store the map of key-value pairs in currentServerKVPairsMap
+                    currentServerKVPairsMap[0].put(hostPort, currentServerPairs);
+                }
+                else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_SEND_KV) {
+                    // Create temporary HashMap to store the changes
+                    // TODO: Gengyang
+                }
+                else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_COMMIT) {
+                    // Apply the changes in the temporary HashMap to the current Server
+                    // TODO: Gengyang
+                }
+                else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_ABORT) {
+                    // Discard the temporary HashMap
+                    // TODO: Gengyang
+                }
+                else {
+                    logger.error("Invalid status for transactionCommunication");
+                }
+                
+                sharedCounter[0].incrementAndGet(); // Increament the counter by 1 to indicate that this thread is done
+            }
+
+        }
+
+        // Wait for all threads to finish
+        while (sharedCounter[0].get() < serverKVPairsMap.size()) {
+            System.out.println("Replies received: " + sharedCounter[0].get() + "/" + serverKVPairsMap.size());
+            try {
+                Thread.sleep(1000); // Can reduce it later
+            } catch (InterruptedException e) {
+                logger.error("Error sleeping", e);
+            }
+        }
+
+        if (status == ServerMessage.ServerMessageStatus.TRANSACTION_GET) {
+            return currentServerKVPairsMap[0];
+        }
+        else {
+            return null;
+        }
+    }
+
     // Get the type of message received
     public MessageType getMessageType(byte[] msgBytes) {
+
         try {
             Message msg = new Message(msgBytes);
             return MessageType.Client_Message;
         }
         catch (IllegalArgumentException iae) {
-            try {
-                ECSMessage msg = new ECSMessage(msgBytes);
-                return MessageType.ECS_Message;
-            }
-            catch (IllegalArgumentException iae2) {
-                try {
-                    ServerMessage msg = new ServerMessage(msgBytes);
-                    return MessageType.Server_Message;
-                }
-                catch (IllegalArgumentException iae3) {
-                    return MessageType.Unknown;
-                }
-                
-            }
         }
+
+        try {
+            ECSMessage msg = new ECSMessage(msgBytes);
+            return MessageType.ECS_Message;
+        }
+        catch (IllegalArgumentException iae) {
+        }
+
+        try {
+            ServerMessage msg = new ServerMessage(msgBytes);
+            return MessageType.Server_Message;
+        }
+        catch (IllegalArgumentException iae) {
+        }
+
+        try {
+            TransactionMessage msg = new TransactionMessage(msgBytes);
+            return MessageType.Transaction_Message;
+        }
+        catch (IllegalArgumentException iae) {
+        }
+
+        return MessageType.Unknown;
     }
 
     /**
@@ -413,7 +684,7 @@ public class ClientConnection implements Runnable {
             logger.error("Error sending message: " + e.getMessage(), e);
         }
     }
-    public void sendServerMessage(ServerMessage msg){
+    public void sendServerMessage(ServerMessage msg, OutputStream output){
         try {
             byte[] msgBytes = msg.toByteArray();
             output.write(msgBytes, 0, msgBytes.length);
@@ -434,9 +705,19 @@ public class ClientConnection implements Runnable {
         }
     }
 
+    public void sendTransactionMessage(TransactionMessage msg) {
+        try {
+            byte[] msgBytes = msg.toByteArray();
+            output.write(msgBytes, 0, msgBytes.length);
+            output.flush();
+        } catch (IOException e) {
+            logger.error("Error sending Transaction message: " + e.getMessage(), e);
+        }
+    }
+
 
     // Read bytes from input stream
-    private byte[] receiveBytes() throws IOException, ClassNotFoundException {
+    private byte[] receiveBytes(InputStream input) throws IOException, ClassNotFoundException {
         int index = 0;
         byte[] msgBytes = null, tmp = null;
         byte[] bufferBytes = new byte[BUFFER_SIZE];
