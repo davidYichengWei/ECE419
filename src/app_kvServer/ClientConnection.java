@@ -673,11 +673,12 @@ public class ClientConnection implements Runnable {
                 }
                 else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_SEND_KV) {
                     Map<String, String> pairs = new HashMap<String, String>();
+
                     try {
                         for (String[] kvPair : kvPairs) {
                             String key = kvPair[0];
                             String value = kvPair[1];
-                            pairs.put(key, value);
+                            this.server.transaction_map.put(key, value);
                         }
                     }
                     catch (Exception e) {
