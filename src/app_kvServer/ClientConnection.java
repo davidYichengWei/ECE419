@@ -505,6 +505,14 @@ public class ClientConnection implements Runnable {
         Map<String, Map<String, String>> initialServerKVPairsMap = 
             transactionCommunication(serverKVPairsMap, ServerMessage.ServerMessageStatus.TRANSACTION_GET);
 
+        // Sleep for 5 seconds to make it easier to test transaction abort
+        try {
+            Thread.sleep(5000);
+        }
+        catch (Exception ex) {
+            logger.error("Error sleeping", ex);
+        }
+
         // TRANSACTION_SEND_KV: send kv pairs in the map to the corresponding servers
         // Server should reply with TRANSACTION_ACK
         logger.info("[Transaction] Sending put requests to servers");
@@ -711,7 +719,7 @@ public class ClientConnection implements Runnable {
 
         // Wait for all threads to finish
         while (sharedCounter[0].get() < serverKVPairsMap.size()) {
-            System.out.println("Replies received: " + sharedCounter[0].get() + "/" + serverKVPairsMap.size());
+            // System.out.println("Replies received: " + sharedCounter[0].get() + "/" + serverKVPairsMap.size());
             try {
                 Thread.sleep(1000); // Can reduce it later
             } catch (InterruptedException e) {
