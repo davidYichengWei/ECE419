@@ -230,13 +230,13 @@ public class PerformanceTest {
                 // System.out.println(i);
                 kvClient.put(i, test_pairs.get(i));
                 num++;
-                // if(num==100){
-                //     break;
-                // }
+                if(num==50){
+                    break;
+                }
             }
-            // for(int i=0;i<20;i++){
-            //     kvClient.get("12.");
-            // }
+            for(int i=0;i<50;i++){
+                kvClient.get("12.");
+            }
             long  endTime = System.currentTimeMillis(); 
             kvClient.disconnect();
             long res = endTime-startTime;

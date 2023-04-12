@@ -11,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.List;
@@ -44,6 +45,7 @@ public class KVServer implements IKVServer, Runnable {
 	private int cacheSize;
 	private CacheStrategy cacheStrategy;
 	private FileStorage fs;
+	public Map<String, String> transaction_map;
 
 	private ZooKeeper zk;
 	private final String metadataPath = "/metadata";
@@ -92,7 +94,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.zkAddress = zkAddress;
 		this.cacheSize = cacheSize;
 		this.cacheStrategy = CacheStrategy.valueOf(strategy);
-
+		transaction_map= new ConcurrentHashMap<String,String>(); 
 		// To be able to call clearStorage() at test setup
 		try {
 			fs = new FileStorage(fileDirectory, serverAddress + ":" + port);
@@ -335,6 +337,7 @@ public class KVServer implements IKVServer, Runnable {
             logger.error("Error sending Server message: " + e.getMessage(), e);
         }
 	}
+	
 	public void transferKV(String[] hashRange, String server){
 		Map<String, String> move_map = fs.findKVOutOfRange(hashRange);
 		// move_map.put("------------", "++++++++++++++++++");

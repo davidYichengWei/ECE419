@@ -15,6 +15,8 @@ public class ServerMessage implements Serializable {
         TRANSACTION_SEND_KV, /* For the coordinator to send kv pairs to corresponding servers */
         TRANSACTION_ACK,     /* For server to notify the coordinator that it's done processing the kv pairs */
         TRANSACTION_ABORT,
+        TRANSACTION_GET_REQ,
+        TRANSACTION_GET_REQ_ACK,
         TRANSACTION_ABORT_ACK,
         TRANSACTION_COMMIT,
         TRANSACTION_COMMIT_ACK

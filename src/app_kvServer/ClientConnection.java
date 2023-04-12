@@ -162,6 +162,87 @@ public class ClientConnection implements Runnable {
             ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.REPLICATE_KV_ACK, "");
             sendServerMessage(reply, output);
         }
+        else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_GET){
+            Map<String, String> pairs = msg.getPairs();
+            try{
+                for(String i:pairs.keySet()){
+                    pairs.put(i, this.server.getKV(i));
+                    
+                }
+                String reply_str = this.server.convert_map_string(pairs);
+                ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.TRANSACTION_GET_ACK, reply_str);
+                sendServerMessage(reply, output);
+            }
+            catch(Exception e){
+                logger.error("Error! Unable to get pairs!", e);
+            }
+        }
+        else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_SEND_KV){
+            Map<String, String> pairs = msg.getPairs();
+            try{
+                for(String i:pairs.keySet()){
+                    this.server.transaction_map.put(i, pairs.get(i));
+                    
+                }
+                ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.TRANSACTION_ACK, "");
+                sendServerMessage(reply, output);
+            }
+            catch(Exception e){
+                logger.error("Error! Unable to store pairs for transaction!", e);
+            }
+        }
+        else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_ABORT){
+            this.server.transaction_map.clear();
+            ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.TRANSACTION_ABORT_ACK, "");
+            sendServerMessage(reply, output);
+        }
+        else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_COMMIT){
+            try{
+                for(String i:this.server.transaction_map.keySet()){
+                    this.server.putKV(i, this.server.transaction_map.get(i));
+                    
+                }
+            }
+            catch(Exception e){
+                logger.error("Error! Unable to commit changes for transaction!", e);
+            }
+            this.server.transaction_map.clear();
+            ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.TRANSACTION_COMMIT_ACK, "");
+            sendServerMessage(reply, output);
+        }
+        else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_GET_REQ){
+
+            Map<String, String> pairs = msg.getPairs();
+            try{
+                for(String i:pairs.keySet()){
+                    if(this.server.transaction_map.get(i) == null)
+                    {
+                        if(this.server.getKV(i) == null)
+                            pairs.put(i, "null");
+                        else{
+                            pairs.put(i,this.server.getKV(i));
+                        }
+                    }
+                    else{
+                        pairs.put(i, this.server.transaction_map.get(i));
+                    }
+                    
+                    
+                }
+                String reply_str = this.server.convert_map_string(pairs);
+                ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.TRANSACTION_GET_REQ_ACK, reply_str);
+                sendServerMessage(reply, output);
+            }
+            catch(Exception e){
+                logger.error("Error! Unable to get pairs!", e);
+            }
+            
+            
+            
+        }
+        
+        
+        
 
 
     }
@@ -591,16 +672,32 @@ public class ClientConnection implements Runnable {
                     currentServerKVPairsMap[0].put(hostPort, currentServerPairs);
                 }
                 else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_SEND_KV) {
-                    // Create temporary HashMap to store the changes
-                    // TODO: Gengyang
+                    Map<String, String> pairs = new HashMap<String, String>();
+                    try {
+                        for (String[] kvPair : kvPairs) {
+                            String key = kvPair[0];
+                            String value = kvPair[1];
+                            pairs.put(key, value);
+                        }
+                    }
+                    catch (Exception e) {
+                        logger.error("Error stroing transaction pairs", e);
+                    }
+                    
                 }
                 else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_COMMIT) {
-                    // Apply the changes in the temporary HashMap to the current Server
-                    // TODO: Gengyang
+                    try {
+                        for( String i:this.server.transaction_map.keySet()){
+                            this.server.putKV(i, this.server.transaction_map.get(i));
+                        }
+                    }
+                    catch (Exception e) {
+                        logger.error("Error commiting transaction changes", e);
+                    }
+                    this.server.transaction_map.clear();
                 }
                 else if (status == ServerMessage.ServerMessageStatus.TRANSACTION_ABORT) {
-                    // Discard the temporary HashMap
-                    // TODO: Gengyang
+                    this.server.transaction_map.clear();
                 }
                 else {
                     logger.error("Invalid status for transactionCommunication");
