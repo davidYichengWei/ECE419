@@ -9,6 +9,8 @@ import app_kvServer.KVServer;
 import junit.framework.TestCase;
 import shared.messages.KVMessage;
 import shared.messages.KVMessage.StatusType;
+import shared.messages.ITransactionMessage;
+import shared.messages.TransactionMessage;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -310,6 +312,135 @@ public class MultiServerTest extends TestCase {
 
             assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
         }
+    }
+
+    // M4 tests
+    @Test
+    public void testTransactionPut() {
+        List<String[]> transactionKVPairs = new ArrayList<String[]>();
+        transactionKVPairs.add(new String[] {"k1", "v1"});
+        transactionKVPairs.add(new String[] {"k2", "v2"});
+        transactionKVPairs.add(new String[] {"k3", "v3"});
+
+        TransactionMessage response = null;
+        Exception ex = null;
+
+        try {
+            response = kvClient.putTransaction(transactionKVPairs);
+        } catch (Exception e) {
+            ex = e;
+        }
+
+        assertTrue(ex == null && response.getStatus() == ITransactionMessage.TStatusType.TRANSACTION_PUT_SUCCESS);
+    }
+
+    @Test
+    public void testTransactionPutAndGet() {
+        List<String[]> transactionKVPairs = new ArrayList<String[]>();
+        transactionKVPairs.add(new String[] {"k1", "v1"});
+        transactionKVPairs.add(new String[] {"k2", "v2"});
+        transactionKVPairs.add(new String[] {"k3", "v3"});
+
+        try {
+            kvClient.putTransaction(transactionKVPairs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Try get the values of the keys
+        for (String[] kvPair : transactionKVPairs) {
+            KVMessage response = null;
+            Exception ex = null;
+
+            try {
+                response = kvClient.get(kvPair[0]);
+            } catch (Exception e) {
+                ex = e;
+            }
+
+            assertTrue(ex == null && response.getStatus() == StatusType.GET_SUCCESS && 
+            response.getValue().equals(kvPair[1]));
+        }
+    }
+
+    @Test
+    public void testTransactionDelete() {
+        List<String[]> transactionKVPairs = new ArrayList<String[]>();
+        transactionKVPairs.add(new String[] {"k1", "null"});
+        transactionKVPairs.add(new String[] {"k2", "null"});
+        transactionKVPairs.add(new String[] {"k3", "null"});
+
+        TransactionMessage response = null;
+        Exception ex = null;
+
+        try {
+            response = kvClient.putTransaction(transactionKVPairs);
+        } catch (Exception e) {
+            ex = e;
+        }
+
+        assertTrue(ex == null && response.getStatus() == ITransactionMessage.TStatusType.TRANSACTION_PUT_SUCCESS);
+    }
+
+    @Test
+    public void testTransactionGetAfterDelete() {
+        List<String[]> transactionKVPairs = new ArrayList<String[]>();
+        transactionKVPairs.add(new String[] {"k1", "null"});
+        transactionKVPairs.add(new String[] {"k2", "null"});
+        transactionKVPairs.add(new String[] {"k3", "null"});
+
+        TransactionMessage response = null;
+        Exception ex = null;
+
+        try {
+            response = kvClient.putTransaction(transactionKVPairs);
+        } catch (Exception e) {
+            ex = e;
+        }
+
+        assertTrue(ex == null && response.getStatus() == ITransactionMessage.TStatusType.TRANSACTION_PUT_SUCCESS);
+
+        // Try get the values and ensure status is GET_ERROR
+        for (String[] kvPair : transactionKVPairs) {
+            KVMessage response = null;
+            Exception ex = null;
+
+            try {
+                response = kvClient.get(kvPair[0]);
+            } catch (Exception e) {
+                ex = e;
+            }
+
+            assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
+        }
+    }
+
+    @Test
+    public void testTransactionFailure() {
+        // Start a new client
+        KVStore newKVClient = new KVStore("localhost", 50000);
+        try {
+			newKVClient.connect();
+		} catch (Exception e) {
+		}
+
+        List<String[]> transactionKVPairs = new ArrayList<String[]>();
+        transactionKVPairs.add(new String[] {"k1", "v1"});
+        transactionKVPairs.add(new String[] {"k2", "v2"});
+        transactionKVPairs.add(new String[] {"k3", "v3"});
+
+        TransactionMessage response = null;
+        Exception ex = null;
+
+        try {
+            response = kvClient.putTransaction(transactionKVPairs);
+            newKVClient.put("k1", "v2");
+        } catch (Exception e) {
+            ex = e;
+        }
+
+        assertTrue(ex == null && response.getStatus() == ITransactionMessage.TStatusType.TRANSACTION_PUT_FAILURE);
+
     }
 
 }
