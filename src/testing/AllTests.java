@@ -36,6 +36,7 @@ public class AllTests {
 		clientSuite.addTestSuite(AdditionalTest.class);
 		clientSuite.addTestSuite(MetadataTest.class);
 		clientSuite.addTestSuite(MultiServerTest.class);
+		clientSuite.addTestSuite(TransactionMessageTest.class);
 		return clientSuite;
 	}
 	
