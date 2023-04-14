@@ -200,12 +200,77 @@ public class ClientConnection implements Runnable {
             try{
                 for(String i:this.server.transaction_map.keySet()){
                     this.server.putKV(i, this.server.transaction_map.get(i));
+                    String keyHash = MD5Hasher.hash(i);
+                    logger.info("keyHash is " + keyHash);
+                    ECSNode current = server.getMetadataObj().findNode(keyHash);
+                    ECSNode firstSuccessor = server.getMetadataObj().findSuccessor(current);
+                    ECSNode secondSuccessor = server.getMetadataObj().findSuccessor(firstSuccessor);
+
+                    boolean isResponsible = server.getHostname().equals(current.getNodeHost()) && server.getPort() == current.getNodePort();
+                    boolean isReplicated1 = server.getHostname().equals(firstSuccessor.getNodeHost()) && server.getPort() == firstSuccessor.getNodePort();
+                    boolean isReplicated2 = server.getHostname().equals(secondSuccessor.getNodeHost()) && server.getPort() == secondSuccessor.getNodePort();
+                    if (!server.getHostname().equals(current.getNodeHost()) || server.getPort() != current.getNodePort()) {
+                        KVMessage.StatusType trans_status = KVMessage.StatusType.SERVER_NOT_RESPONSIBLE;
+                        sendClientMessage(new Message(null, null, trans_status));
+                        return;
+                    }
+                    // Check for write lock
+                    if (server.getStatus() == IKVServer.ServerStatus.SERVER_WRITE_LOCK) {
+                        KVMessage.StatusType trans_status = KVMessage.StatusType.SERVER_WRITE_LOCK;
+                        sendClientMessage(new Message(null, null, trans_status));
+                        return;
+                    }
+                    // Check if PUT, PUT_UPDATE or DELETE
+                    boolean delete = false;
+                    boolean update = false;
+                    if (this.server.transaction_map.get(i).equals("null")) {
+                        delete = true;
+                    }
+                    else {
+                       
+                        String value = server.getKV(i);
+                        if (value != null) {
+                            update = true;
+                        }
+                        
+                        
+                    }
+
+                    
+                    server.putKV(i,this.server.transaction_map.get(i));
+                    KVMessage.StatusType trans_status = KVMessage.StatusType.PUT_SUCCESS;
+                    if (delete) {
+                        trans_status = KVMessage.StatusType.DELETE_SUCCESS;
+                    }
+                    else if (update) {
+                        trans_status = KVMessage.StatusType.PUT_UPDATE;
+                    }
+
+                    sendClientMessage(new Message(
+                        i, this.server.transaction_map.get(i),
+                        trans_status));
+                    if(!isReplicated1)
+                    {
+                        server.send_one_kv(firstSuccessor.getNodeHost(), firstSuccessor.getNodePort(), i,this.server.transaction_map.get(i));
+                    }
+                    if(!isReplicated2)
+                    {
+                        server.send_one_kv(secondSuccessor.getNodeHost(),secondSuccessor.getNodePort(), i,this.server.transaction_map.get(i));
+                    }
+                        
+                    
+            
                     
                 }
             }
             catch(Exception e){
                 logger.error("Error! Unable to commit changes for transaction!", e);
             }
+
+
+
+
+            
             this.server.transaction_map.clear();
             ServerMessage reply = new ServerMessage(ServerMessage.ServerMessageStatus.TRANSACTION_COMMIT_ACK, "");
             sendServerMessage(reply, output);
@@ -698,10 +763,71 @@ public class ClientConnection implements Runnable {
                     try {
                         for( String i:this.server.transaction_map.keySet()){
                             this.server.putKV(i, this.server.transaction_map.get(i));
+                            String keyHash = MD5Hasher.hash(i);
+                            logger.info("keyHash is " + keyHash);
+                            ECSNode current = server.getMetadataObj().findNode(keyHash);
+                            ECSNode firstSuccessor = server.getMetadataObj().findSuccessor(current);
+                            ECSNode secondSuccessor = server.getMetadataObj().findSuccessor(firstSuccessor);
+        
+                            boolean isResponsible = server.getHostname().equals(current.getNodeHost()) && server.getPort() == current.getNodePort();
+                            boolean isReplicated1 = server.getHostname().equals(firstSuccessor.getNodeHost()) && server.getPort() == firstSuccessor.getNodePort();
+                            boolean isReplicated2 = server.getHostname().equals(secondSuccessor.getNodeHost()) && server.getPort() == secondSuccessor.getNodePort();
+                            if (!server.getHostname().equals(current.getNodeHost()) || server.getPort() != current.getNodePort()) {
+                                KVMessage.StatusType trans_status = KVMessage.StatusType.SERVER_NOT_RESPONSIBLE;
+                                sendClientMessage(new Message(null, null, trans_status));
+                                break;
+                            }
+                            // Check for write lock
+                            if (server.getStatus() == IKVServer.ServerStatus.SERVER_WRITE_LOCK) {
+                                KVMessage.StatusType trans_status = KVMessage.StatusType.SERVER_WRITE_LOCK;
+                                sendClientMessage(new Message(null, null, trans_status));
+                                break;
+                            }
+                            // Check if PUT, PUT_UPDATE or DELETE
+                            boolean delete = false;
+                            boolean update = false;
+                            if (this.server.transaction_map.get(i).equals("null")) {
+                                delete = true;
+                            }
+                            else {
+                               
+                                String value = server.getKV(i);
+                                if (value != null) {
+                                    update = true;
+                                }
+                                
+                                
+                            }
+        
+                            
+                            server.putKV(i,this.server.transaction_map.get(i));
+                            KVMessage.StatusType trans_status = KVMessage.StatusType.PUT_SUCCESS;
+                            if (delete) {
+                                trans_status = KVMessage.StatusType.DELETE_SUCCESS;
+                            }
+                            else if (update) {
+                                trans_status = KVMessage.StatusType.PUT_UPDATE;
+                            }
+        
+                            sendClientMessage(new Message(
+                                i, this.server.transaction_map.get(i),
+                                trans_status));
+                            if(!isReplicated1)
+                            {
+                                server.send_one_kv(firstSuccessor.getNodeHost(), firstSuccessor.getNodePort(), i,this.server.transaction_map.get(i));
+                            }
+                            if(!isReplicated2)
+                            {
+                                server.send_one_kv(secondSuccessor.getNodeHost(),secondSuccessor.getNodePort(), i,this.server.transaction_map.get(i));
+                            }
+                                
+                            
+                    
+                            
                         }
                     }
-                    catch (Exception e) {
-                        logger.error("Error commiting transaction changes", e);
+                    catch(Exception e){
+                        logger.error("Error! Unable to commit changes for transaction!", e);
                     }
                     this.server.transaction_map.clear();
                 }

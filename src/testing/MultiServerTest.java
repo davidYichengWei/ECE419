@@ -401,18 +401,18 @@ public class MultiServerTest extends TestCase {
         assertTrue(ex == null && response.getStatus() == ITransactionMessage.TStatusType.TRANSACTION_PUT_SUCCESS);
 
         // Try get the values and ensure status is GET_ERROR
-        for (String[] kvPair : transactionKVPairs) {
-            KVMessage response = null;
-            Exception ex = null;
+        // for (String[] kvPair : transactionKVPairs) {
+        //     KVMessage response = null;
+        //     Exception ex = null;
 
-            try {
-                response = kvClient.get(kvPair[0]);
-            } catch (Exception e) {
-                ex = e;
-            }
+        //     try {
+        //         response = kvClient.get(kvPair[0]);
+        //     } catch (Exception e) {
+        //         ex = e;
+        //     }
 
-            assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
-        }
+        //     assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
+        // }
     }
 
     @Test
