@@ -402,16 +402,16 @@ public class MultiServerTest extends TestCase {
 
         // Try get the values and ensure status is GET_ERROR
         for (String[] kvPair : transactionKVPairs) {
-            KVMessage response = null;
-            Exception ex = null;
+            KVMessage kvResponse = null;
+            ex = null;
 
             try {
-                response = kvClient.get(kvPair[0]);
+                kvResponse = kvClient.get(kvPair[0]);
             } catch (Exception e) {
                 ex = e;
             }
 
-            assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
+            assertTrue(ex == null && kvResponse.getStatus() == StatusType.GET_ERROR);
         }
     }
 
