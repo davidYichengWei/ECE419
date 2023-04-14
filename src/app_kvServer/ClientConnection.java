@@ -209,17 +209,17 @@ public class ClientConnection implements Runnable {
                     boolean isResponsible = server.getHostname().equals(current.getNodeHost()) && server.getPort() == current.getNodePort();
                     boolean isReplicated1 = server.getHostname().equals(firstSuccessor.getNodeHost()) && server.getPort() == firstSuccessor.getNodePort();
                     boolean isReplicated2 = server.getHostname().equals(secondSuccessor.getNodeHost()) && server.getPort() == secondSuccessor.getNodePort();
-                    if (!server.getHostname().equals(current.getNodeHost()) || server.getPort() != current.getNodePort()) {
-                        KVMessage.StatusType trans_status = KVMessage.StatusType.SERVER_NOT_RESPONSIBLE;
-                        sendClientMessage(new Message(null, null, trans_status));
-                        return;
-                    }
-                    // Check for write lock
-                    if (server.getStatus() == IKVServer.ServerStatus.SERVER_WRITE_LOCK) {
-                        KVMessage.StatusType trans_status = KVMessage.StatusType.SERVER_WRITE_LOCK;
-                        sendClientMessage(new Message(null, null, trans_status));
-                        return;
-                    }
+                    // if (!server.getHostname().equals(current.getNodeHost()) || server.getPort() != current.getNodePort()) {
+                    //     KVMessage.StatusType trans_status = KVMessage.StatusType.SERVER_NOT_RESPONSIBLE;
+                    //     sendClientMessage(new Message(null, null, trans_status));
+                    //     return;
+                    // }
+                    // // Check for write lock
+                    // if (server.getStatus() == IKVServer.ServerStatus.SERVER_WRITE_LOCK) {
+                    //     KVMessage.StatusType trans_status = KVMessage.StatusType.SERVER_WRITE_LOCK;
+                    //     sendClientMessage(new Message(null, null, trans_status));
+                    //     return;
+                    // }
                     // Check if PUT, PUT_UPDATE or DELETE
                     boolean delete = false;
                     boolean update = false;
@@ -514,14 +514,7 @@ public class ClientConnection implements Runnable {
                     
                 }
                 catch (Exception ex) {
-                    KVMessage.StatusType errorStatus = KVMessage.StatusType.PUT_ERROR;
-                    if (delete) {
-                        errorStatus = KVMessage.StatusType.DELETE_ERROR;
-                    }
-                    logger.error("PUT ERROR", ex);
-                    sendClientMessage(new Message(
-                        msg.getKey(), msg.getValue(),
-                        errorStatus));
+                    
                 }
             }
         }
