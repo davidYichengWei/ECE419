@@ -222,7 +222,7 @@ public class ClientConnection implements Runnable {
                     // }
                     // Check if PUT, PUT_UPDATE or DELETE
                     if(isResponsible){
-                        continue;
+                        
                     }
                     if(!isReplicated1)
                     {
@@ -719,14 +719,14 @@ public class ClientConnection implements Runnable {
                             ECSNode current = server.getMetadataObj().findNode(keyHash);
                             ECSNode firstSuccessor = server.getMetadataObj().findSuccessor(current);
                             ECSNode secondSuccessor = server.getMetadataObj().findSuccessor(firstSuccessor);
-                            logger.info("_________________________________________something wrong here");
+                            // logger.info("_________________________________________something wrong here");
                             boolean isResponsible = server.getHostname().equals(current.getNodeHost()) && server.getPort() == current.getNodePort();
                             boolean isReplicated1 = server.getHostname().equals(firstSuccessor.getNodeHost()) && server.getPort() == firstSuccessor.getNodePort();
                             boolean isReplicated2 = server.getHostname().equals(secondSuccessor.getNodeHost()) && server.getPort() == secondSuccessor.getNodePort();
                             
                             // Check if PUT, PUT_UPDATE or DELETE
                             if(isResponsible){
-                                continue;
+                                // continue;
                             }
                             if(!isReplicated1)
                             {
