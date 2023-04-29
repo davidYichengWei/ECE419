@@ -1,4 +1,4 @@
-# CMU15-445
+# Distributed KV Store
 You need a java environment first
 
 Install ant which is a java project builder, on mac/linux run: brew install ant
